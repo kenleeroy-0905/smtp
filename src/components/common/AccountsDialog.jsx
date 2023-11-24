@@ -79,10 +79,10 @@ const AccountsDialog = ({ open, close, users }) => {
           justifyContent="center"
           gap={2}
         >
-          {accounts.map((account) => {
+          {accounts?.map((account) => {
             return (
               <Box
-                key={account.name}
+                key={account?.name}
                 bgcolor="#f4f4f5"
                 px={4}
                 py={3}
@@ -103,7 +103,7 @@ const AccountsDialog = ({ open, close, users }) => {
                 }}
               >
                 <Stack
-                  account={account.name}
+                  account={account?.name}
                   width="100%"
                   direction="row"
                   justifyContent="space-between"
@@ -117,7 +117,7 @@ const AccountsDialog = ({ open, close, users }) => {
                     />
                     <Stack alignItems="flex-start">
                       <Typography variant="h6" sx={{ fontWeight: "400" }}>
-                        {account.name}
+                        {account?.name}
                       </Typography>
                     </Stack>
                   </Stack>

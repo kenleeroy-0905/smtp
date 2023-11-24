@@ -8,18 +8,20 @@ import {
   Stepper,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Divider from "@mui/material/Divider";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import Terms from "./Terms";
 import DomainInput from "./DomainInput";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const VerificationComponent = () => {
   const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0);
   const [openTerms, setOpenTerms] = useState(false);
   const [openDomainInput, setOpenDomainInput] = useState(false);
+  const { selectedDomain } = useSelector((state) => state.domain);
 
   const handleNext = () => {
     setActiveStep((prev) => prev + 1);
@@ -30,6 +32,12 @@ const VerificationComponent = () => {
   const handleCloseDomainInput = () => {
     setOpenDomainInput(false);
   };
+
+  useEffect(() => {
+    if (selectedDomain) {
+      setActiveStep(2);
+    }
+  }, []);
   return (
     <>
       <Grid
@@ -132,7 +140,16 @@ const VerificationComponent = () => {
           </Step>
           <Step>
             <StepContent>
-              <Typography variant="h5">Verify your domain</Typography>
+              <Stack direction="row" alignItems="center" spacing={1}>
+                <Typography variant="h5">Verify your domain:</Typography>
+                <Typography
+                  variant="h5"
+                  sx={{ fontWeight: 500, textDecoration: "underline" }}
+                >
+                  {selectedDomain}
+                </Typography>
+              </Stack>
+
               <Typography variant="subtitle1">
                 This protects your domain from unauthorized use.
               </Typography>

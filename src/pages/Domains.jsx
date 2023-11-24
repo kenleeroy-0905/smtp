@@ -1,9 +1,15 @@
 import { Button, Grid, Stack, Typography } from "@mui/material";
 import AddBoxIcon from "@mui/icons-material/AddBox";
-import React from "react";
+import React, { useState } from "react";
 import DomainsTable from "../components/common/DomainsTable";
+import DomainInput from "../components/common/DomainInput";
 
 const Domains = () => {
+  const [openDomainInput, setOpenDomainInput] = useState(false);
+  const handleCloseDomainInput = () => {
+    setOpenDomainInput(false);
+  };
+
   return (
     <>
       <Grid
@@ -45,6 +51,7 @@ const Domains = () => {
             }}
             variant="contained"
             startIcon={<AddBoxIcon />}
+            onClick={() => setOpenDomainInput(true)}
           >
             Add Domain
           </Button>
@@ -53,6 +60,12 @@ const Domains = () => {
           <DomainsTable />
         </Grid>
       </Grid>
+      <DomainInput
+        type="domain"
+        title="Add a Sending Domain:"
+        open={openDomainInput}
+        close={handleCloseDomainInput}
+      />
     </>
   );
 };

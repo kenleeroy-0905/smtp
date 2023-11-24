@@ -52,14 +52,15 @@ const DomainInput = ({ open, close, next, title, type }) => {
       activeCompany.id,
       userInfo.token
     );
-    console.log(data);
     if (data.data.message === "Successfully add domain") {
-      dispatch(setSelectedDomain(domain));
       setIsLoading(false);
       setMessage(data.data.message);
       setSeverity("success");
       setIsError(true);
-      next();
+      if (next) {
+        dispatch(setSelectedDomain(domain));
+        next();
+      }
       close();
     } else {
       setIsError(true);

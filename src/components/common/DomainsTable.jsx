@@ -1,23 +1,31 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { Box, Button } from "@mui/material";
 import { customToolbar } from "../../assets/utils";
 import logo from "../../assets/images/logo.png";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { setSelectedDomain } from "../../app/redux/features/slices/domain/domainSlice";
 
 const DomainsTable = () => {
-  const rows = [
-    {
-      id: 1,
-      domain: "example.com",
-      verified: true,
-      sent: 50,
-      delivered: 40,
-      rejected: 5,
-      received: 35,
-    },
-  ];
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { activeCompany } = useSelector((state) => state.user);
+  const [rows, setRows] = useState([]);
+
+  useEffect(() => {
+    if (activeCompany) {
+      const domains = activeCompany.domain?.map((domain) => ({
+        id: domain.id,
+        domain: domain.domain_name,
+        verified: domain.status,
+      }));
+      setRows(domains);
+      console.log(domains);
+    }
+  }, [activeCompany]);
 
   const columns = [
     {
@@ -25,7 +33,7 @@ const DomainsTable = () => {
       headerName: "Domain Name",
       width: 250,
       headerAlign: "center",
-      align: "center",
+      align: "left",
       renderCell: (params) => (
         <div
           style={{
@@ -60,7 +68,7 @@ const DomainsTable = () => {
       renderCell: (params) => (
         <div style={{ textAlign: "center" }}>
           <span>
-            {params.row.verified ? (
+            {params.row.verified === "active" ? (
               <div
                 style={{
                   display: "flex",
@@ -110,15 +118,13 @@ const DomainsTable = () => {
         >
           <div style={{ textAlign: "center" }}>
             <span style={{ fontSize: "1.2rem", fontWeight: "500" }}>
-              {params.row.sent}
-              <br></br>
+              0<br></br>
             </span>
             <span style={{ fontSize: "1.2rem", fontWeight: "500" }}>Sent</span>
           </div>
           <div style={{ textAlign: "center" }}>
             <span style={{ fontSize: "1.2rem", fontWeight: "500" }}>
-              {params.row.delivered}
-              <br></br>
+              0<br></br>
             </span>
             <span style={{ fontSize: "1.2rem", fontWeight: "500" }}>
               Delivered
@@ -144,8 +150,7 @@ const DomainsTable = () => {
         >
           <div style={{ textAlign: "center" }}>
             <span style={{ fontSize: "1.2rem", fontWeight: "500" }}>
-              {params.row.received}
-              <br></br>
+              0<br></br>
             </span>
             <span style={{ fontSize: "1.2rem", fontWeight: "500" }}>
               Received
@@ -153,8 +158,7 @@ const DomainsTable = () => {
           </div>
           <div style={{ textAlign: "center" }}>
             <span style={{ fontSize: "1.2rem", fontWeight: "500" }}>
-              {params.row.rejected}
-              <br></br>
+              0<br></br>
             </span>
             <span style={{ fontSize: "1.2rem", fontWeight: "500" }}>
               Rejected
@@ -168,30 +172,49 @@ const DomainsTable = () => {
       width: 200,
       headerName: "",
       align: "right",
-      renderCell: () => (
-        <Button
-          variant="contained"
-          sx={{
-            backgroundColor: "#154b69",
-            "&:hover": {
-              backgroundColor: "#00a3b1",
-            },
-          }}
-        >
-          Manage
-        </Button>
+      renderCell: (params) => (
+        <div>
+          {params.row.verified === "active" ? (
+            <Button
+              variant="contained"
+              sx={{
+                backgroundColor: "#154b69",
+                "&:hover": {
+                  backgroundColor: "#00a3b1",
+                },
+              }}
+            >
+              Manage
+            </Button>
+          ) : (
+            <Button
+              variant="contained"
+              sx={{
+                backgroundColor: "#154b69",
+                "&:hover": {
+                  backgroundColor: "#00a3b1",
+                },
+              }}
+              onClick={() => {
+                dispatch(setSelectedDomain(params.row.domain));
+                navigate("/dashboard/verify-domain");
+              }}
+            >
+              Verify
+            </Button>
+          )}
+        </div>
       ),
     },
   ];
 
   return (
     <>
-      <Box sx={{ my: 5, width: "100%", height: 350 }}>
+      <Box sx={{ my: 5, width: "100%", height: 500 }}>
         <DataGrid
           rows={rows}
           columns={columns}
-          pageSize={5}
-          rowsPerPageOptions={[5, 10, 20]}
+          density="comfortable"
           slots={{
             toolbar: customToolbar,
           }}
