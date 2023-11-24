@@ -1,6 +1,9 @@
 import React from "react";
 import TextField from "@mui/material/TextField";
 import { alpha, styled } from "@mui/material/styles";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import { IconButton, InputAdornment } from "@mui/material";
 
 const CustomTextField = styled(TextField)({
   "& value.Mui-focused": {
@@ -33,7 +36,12 @@ const CustomTextFieldComponent = ({
   helper,
   error,
   type,
+  showPassword,
+  setShowPassword,
 }) => {
+  const changeShowPassword = () => {
+    setShowPassword();
+  };
   return (
     <CustomTextField
       required
@@ -45,7 +53,21 @@ const CustomTextFieldComponent = ({
       onChange={handler}
       helperText={helper}
       error={error}
-      type={type && type}
+      type={showPassword ? "text" : type}
+      InputProps={{
+        endAdornment:
+          type === "password" ? (
+            <InputAdornment position="end">
+              <IconButton onClick={changeShowPassword}>
+                {showPassword ? (
+                  <VisibilityIcon sx={{ color: "#00a3b1" }} />
+                ) : (
+                  <VisibilityOffIcon sx={{ color: "#154b69" }} />
+                )}
+              </IconButton>
+            </InputAdornment>
+          ) : null,
+      }}
     />
   );
 };

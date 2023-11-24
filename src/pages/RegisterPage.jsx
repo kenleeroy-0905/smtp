@@ -34,6 +34,7 @@ const RegisterPage = () => {
   const [checked, setChecked] = useState(false);
   const [emailError, setEmailError] = useState(false);
   const [open, setOpen] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const [formData, setFormData] = useState({
     company: "",
@@ -85,6 +86,10 @@ const RegisterPage = () => {
           setSeverity("error");
         });
     }
+  };
+
+  const changeShowPassword = () => {
+    setShowPassword(!showPassword);
   };
 
   const changeHandler = (e) => {
@@ -222,6 +227,8 @@ const RegisterPage = () => {
                     value={formData.password}
                     label={"Password"}
                     name="password"
+                    showPassword={showPassword}
+                    setShowPassword={changeShowPassword}
                   />
                   <Stack
                     direction="row"

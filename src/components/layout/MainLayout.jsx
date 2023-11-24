@@ -1,19 +1,27 @@
 import { Box } from "@mui/material";
-import React from "react";
+import React, { useEffect } from "react";
 import Sidebar from "../common/Sidebar";
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import Header from "../common/Header";
 import FooterMenu from "../common/FooterMenu";
+import { useSelector } from "react-redux";
 
 const sidebarWidth = 350;
 
 const MainLayout = () => {
+  const { userInfo } = useSelector((state) => state.auth);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!userInfo) {
+      navigate("/");
+    }
+  }, [userInfo]);
   return (
     <Box display="flex">
       {/* sidebar */}
       <Sidebar sidebarWidth={sidebarWidth} />
       {/* sidebar */}
-      {/* TODO: FIX SIDEBAR ON MOBILE VIEW */}
       <Box
         component="main"
         sx={{

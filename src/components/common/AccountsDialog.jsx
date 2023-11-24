@@ -11,38 +11,23 @@ import { Box, Grid, Stack, Tooltip } from "@mui/material";
 import Logo from "../../assets/images/logo.png";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DomainInput from "./DomainInput";
+import { useDispatch } from "react-redux";
+import { setActiveCompany } from "../../app/redux/features/slices/user/userSlice";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-const dummyAccounts = [
-  {
-    id: 1,
-    name: "FutureVision",
-    plan: "Basic Plan",
-  },
-];
-
-const AccountsDialog = ({ open, close }) => {
+const AccountsDialog = ({ open, close, users }) => {
   const [domain, setDomain] = React.useState("");
   const [openDomainInput, setOpenDomainInput] = React.useState(false);
-  const [accounts, setAccounts] = React.useState(dummyAccounts);
+  const [accounts, setAccounts] = React.useState(users);
+  const dispatch = useDispatch();
   const handleClose = () => {
     close();
   };
   const handleCloseDomainInput = () => {
     setOpenDomainInput(false);
-  };
-  const handleNext = () => {
-    setAccounts([
-      ...accounts,
-      { id: accounts.length + 1, name: domain, plan: "Basic Plan" },
-    ]);
-  };
-
-  const removeAccount = (id) => {
-    setAccounts(accounts.filter((account) => account.id !== id));
   };
 
   return (
@@ -81,7 +66,6 @@ const AccountsDialog = ({ open, close }) => {
                 },
               }}
               variant="contained"
-              onClick={() => setOpenDomainInput(true)}
             >
               Add Account
             </Button>
@@ -98,6 +82,7 @@ const AccountsDialog = ({ open, close }) => {
           {accounts.map((account) => {
             return (
               <Box
+                key={account.name}
                 bgcolor="#f4f4f5"
                 px={4}
                 py={3}
@@ -112,9 +97,13 @@ const AccountsDialog = ({ open, close }) => {
                     backgroundColor: "#d6ebed",
                   },
                 }}
+                onClick={() => {
+                  dispatch(setActiveCompany(account));
+                  handleClose();
+                }}
               >
                 <Stack
-                  account={account.id}
+                  account={account.name}
                   width="100%"
                   direction="row"
                   justifyContent="space-between"
@@ -130,9 +119,6 @@ const AccountsDialog = ({ open, close }) => {
                       <Typography variant="h6" sx={{ fontWeight: "400" }}>
                         {account.name}
                       </Typography>
-                      <Typography variant="body2" sx={{ fontWeight: "400" }}>
-                        Plan: {account.plan}
-                      </Typography>
                     </Stack>
                   </Stack>
                   <Button
@@ -144,7 +130,6 @@ const AccountsDialog = ({ open, close }) => {
                     }}
                     variant="contained"
                     startIcon={<DeleteIcon />}
-                    onClick={() => removeAccount(account.id)}
                   >
                     Remove
                   </Button>
@@ -153,14 +138,14 @@ const AccountsDialog = ({ open, close }) => {
             );
           })}
         </Grid>
-        <DomainInput
+        {/* <DomainInput
           type={"account"}
           title={"Enter New Account Name:"}
           open={openDomainInput}
           close={handleCloseDomainInput}
           next={handleNext}
           setDomain={setDomain}
-        />
+        /> */}
       </Dialog>
     </>
   );

@@ -23,6 +23,8 @@ import {
 import { images } from "../../assets";
 import Animate from "./Animate";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { logout } from "../../app/redux/features/slices/auth/authSlice";
 
 const menus = [
   {
@@ -78,8 +80,10 @@ const investmentMenus = [
 const Sidebar = ({ sidebarWidth }) => {
   const navigate = useNavigate();
   const [activeState, setActiveState] = useState("dashboard");
+  const dispatch = useDispatch();
 
   const logOut = () => {
+    dispatch(logout());
     navigate("/");
   };
 

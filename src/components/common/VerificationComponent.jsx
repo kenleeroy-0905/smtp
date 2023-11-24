@@ -19,7 +19,6 @@ const VerificationComponent = () => {
   const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0);
   const [openTerms, setOpenTerms] = useState(false);
-  const [domain, setDomain] = useState("");
   const [openDomainInput, setOpenDomainInput] = useState(false);
 
   const handleNext = () => {
@@ -81,30 +80,6 @@ const VerificationComponent = () => {
         <Typography variant="h4">Complete your verification</Typography>
         <Typography variant="h6">Follow the steps below:</Typography>
         <Stepper activeStep={activeStep} orientation="vertical" sx={{ mt: 2 }}>
-          <Step>
-            <StepContent>
-              <Typography variant="h5">Verify your email address</Typography>
-              <Typography variant="subtitle1">
-                You can do this by clicking the verification link that we will
-                send you. Check your inbox!
-              </Typography>
-              <Box sx={{ mt: 2 }}>
-                <Button
-                  variant="contained"
-                  onClick={handleNext}
-                  sx={{
-                    mr: 2,
-                    bgcolor: "#154b69",
-                    "&:hover": {
-                      backgroundColor: "#00a3b1",
-                    },
-                  }}
-                >
-                  Send
-                </Button>
-              </Box>
-            </StepContent>
-          </Step>
           <Step>
             <StepContent>
               <Typography variant="h5">
@@ -203,7 +178,6 @@ const VerificationComponent = () => {
             Receive Approval
           </Button>
         </Stack>
-
         <Typography variant="subtitle1">
           During the approval process, you have the ability to send emails to
           recipients with your domain. Once your account is approved by our
@@ -218,7 +192,6 @@ const VerificationComponent = () => {
         open={openDomainInput}
         close={handleCloseDomainInput}
         next={handleNext}
-        setDomain={setDomain}
       />
     </>
   );

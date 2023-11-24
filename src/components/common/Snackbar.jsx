@@ -12,9 +12,12 @@ export default function CustomizedSnackbar({
   severity,
   handleClose,
 }) {
+  const handleCloseBar = () => {
+    handleClose();
+  };
   return (
-    <Snackbar open={open} autoHideDuration={500}>
-      <Alert onClose={handleClose} severity={severity} sx={{ width: "100%" }}>
+    <Snackbar open={open} autoHideDuration={1000} onClose={handleCloseBar}>
+      <Alert severity={severity} sx={{ width: "100%" }}>
         {message}
       </Alert>
     </Snackbar>

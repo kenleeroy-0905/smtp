@@ -1,6 +1,5 @@
 import { Grid } from "@mui/material";
 import React, { useState } from "react";
-import Header from "../components/common/Header";
 import VerificationComponent from "../components/common/VerificationComponent";
 import HomeComponent from "../components/common/HomeComponent";
 

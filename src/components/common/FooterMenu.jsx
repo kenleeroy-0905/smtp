@@ -39,6 +39,7 @@ const FooterMenu = () => {
         {menuItems.map((item, index) => {
           return (
             <Box
+              key={item.title}
               display={"flex"}
               justifyContent={"center"}
               alignItems={"center"}

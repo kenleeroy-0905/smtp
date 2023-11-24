@@ -2,65 +2,111 @@ import {
   Box,
   Button,
   Checkbox,
-  CircularProgress,
   FormControlLabel,
   FormGroup,
   Stack,
   TextField,
   Typography,
-  circularProgressClasses,
   colors,
+  InputAdornment,
+  IconButton,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from "@mui/material";
-import React, { useState } from "react";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import { images } from "../assets";
 import { Link, useNavigate } from "react-router-dom";
 import Animate from "../components/common/Animate";
-import axios from "axios";
+import SimpleBackdrop from "../components/common/Backdrop";
+import { useDispatch, useSelector } from "react-redux";
+import { setCredentials } from "../app/redux/features/slices/auth/authSlice";
+import { fetchActiveCompany } from "../assets/utils";
+import { setActiveCompany } from "../app/redux/features/slices/user/userSlice";
+import CustomizedSnackbar from "../components/common/Snackbar";
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const [onRequest, setOnRequest] = useState(false);
-  const [loginProgress, setLoginProgress] = useState(0);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [formData, setFormData] = useState({ email: "", password: "" });
+  const [open, setOpen] = useState(false);
+  const [token, setToken] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const { userInfo } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (userInfo) {
+      setIsLoading(true);
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 500);
+    }
+  }, [userInfo, navigate]);
+
+  const resendVerificationEmail = async (tokenData) => {
+    try {
+      console.log(tokenData);
+      await axios
+        .post("/user/resend-verification.php", { token: tokenData })
+        .then((res) => {
+          console.log(res);
+          setOpen(false);
+          setTimeout(() => {
+            navigate("/");
+          }, 500);
+        })
+        .catch((err) => console.log(err));
+    } catch (err) {
+      return err;
+    }
+  };
 
   const onChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const onSignin = (e) => {
+  const onSignin = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     const { email, password } = formData;
 
     const data = {
       email: email,
       password: password,
     };
-
-    axios
+    await axios
       .post("/user/login.php", data)
       .then((res) => {
-        console.log(res);
-        setOnRequest(true);
-        const interval = setInterval(() => {
-          setLoginProgress((prev) => prev + 100 / 40);
-        }, 50);
-
-        setTimeout(() => {
-          clearInterval(interval);
-        }, 2000);
-
-        setTimeout(() => {
-          setIsLoggedIn(true);
-        }, 2100);
-
-        setTimeout(() => {
-          navigate("/dashboard");
-        }, 3300);
+        const data = res.data.data;
+        if (data.email_verify !== "true") {
+          setIsLoading(false);
+          setToken(data.token);
+          setOpen(true);
+        } else {
+          dispatch(setCredentials(data));
+          dispatch(setActiveCompany(fetchActiveCompany(data.company)));
+          setIsLoading(false);
+          setTimeout(() => {
+            navigate("/dashboard");
+          }, 1000);
+        }
       })
       .catch((err) => {
-        console.log(err);
+        console.log(err.data);
+        setIsError(true);
+        setErrorMessage("Wrong email or Password! Please try again.");
+        setIsLoading(false);
       });
   };
 
@@ -70,6 +116,7 @@ const LoginPage = () => {
       height="100vh"
       sx={{ "::-webkit-scrollbar": { display: "none" } }}
     >
+      <SimpleBackdrop status={isLoading} />
       {/* background box */}
       <Box
         sx={{
@@ -151,10 +198,27 @@ const LoginPage = () => {
                   />
                   <TextField
                     label="Password"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     name="password"
                     fullWidth
                     onChange={onChange}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            onClick={() => {
+                              setShowPassword(!showPassword);
+                            }}
+                          >
+                            {showPassword ? (
+                              <VisibilityIcon sx={{ color: "#00a3b1" }} />
+                            ) : (
+                              <VisibilityOffIcon sx={{ color: "#154b69" }} />
+                            )}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
                   />
                   <Button
                     type="submit"
@@ -200,50 +264,49 @@ const LoginPage = () => {
             </Animate>
           </Box>
           {/* footer */}
-
-          {/* loading box */}
-          {onRequest && (
-            <Stack
-              alignItems="center"
-              justifyContent="center"
-              sx={{
-                height: "100%",
-                width: "100%",
-                position: "absolute",
-                top: 0,
-                left: 0,
-                bgcolor: colors.common.white,
-                zIndex: 1000,
-              }}
-            >
-              <Box position="relative">
-                <CircularProgress
-                  variant="determinate"
-                  sx={{ color: colors.grey[200] }}
-                  size={100}
-                  value={100}
-                />
-                <CircularProgress
-                  variant="determinate"
-                  disableShrink
-                  value={loginProgress}
-                  size={100}
-                  sx={{
-                    [`& .${circularProgressClasses.circle}`]: {
-                      strokeLinecap: "round",
-                    },
-                    position: "absolute",
-                    left: 0,
-                    color: "#154b69",
-                  }}
-                />
-              </Box>
-            </Stack>
-          )}
-          {/* loading box */}
         </Box>
       </Box>
       {/* Login form */}
+      <Dialog
+        open={open}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title" sx={{ color: "#d32f2f" }}>
+          {"Email is not verified!"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText
+            id="alert-dialog-description"
+            sx={{ fontWeight: 500 }}
+          >
+            Your Email is not yet verified. Please check your email and verify.
+            If you did not receive any email, please click on resend button.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              resendVerificationEmail(token);
+            }}
+            autoFocus
+            sx={{
+              backgroundColor: "#154b69",
+              "&:hover": {
+                backgroundColor: "#00a3b1",
+              },
+            }}
+            variant="contained"
+          >
+            Resend
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <CustomizedSnackbar
+        open={isError}
+        message={errorMessage}
+        severity={"error"}
+      />
     </Box>
   );
 };

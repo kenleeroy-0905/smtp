@@ -29,6 +29,7 @@ const VerifyDomainTxt = ({ mainTxt, secondaryTxt, textField }) => {
               value={textField}
               id="fullWidth"
               sx={{ width: "800px" }}
+              multiline
             />
           </Tooltip>
         )}

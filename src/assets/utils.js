@@ -11,6 +11,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import AddIcon from "@mui/icons-material/Add";
+import axios from "axios";
 
 export const spamPolicyContent = (
   <>
@@ -161,3 +162,20 @@ export const validateEmail = (email) => {
 };
 
 export const viewOptions = ["Last Month", "Last Week"];
+
+export const resendVerificationEmail = async (token) => {
+  try {
+    console.log(token);
+    await axios
+      .post("/user/resend-verification.php", { token: token })
+      .then((res) => console.log(res))
+      .catch((err) => console.log(err));
+  } catch (err) {
+    return err;
+  }
+};
+
+export const fetchActiveCompany = (data) => {
+  const activeCompany = data.filter((company) => company.active === true);
+  return activeCompany[0];
+};

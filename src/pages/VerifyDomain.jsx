@@ -6,7 +6,8 @@ import {
   Tooltip,
   Divider,
 } from "@mui/material";
-import React from "react";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import Link from "@mui/material/Link";
 import VerifyDomainTxt from "../components/common/VerifyDomainTxt";
@@ -19,16 +20,35 @@ import Looks4Icon from "@mui/icons-material/Looks4";
 import { CustomTextField } from "../assets/utils";
 import DeleteDialog from "../components/common/DeleteDialog";
 import VerifyDomainInfo from "../components/common/VerifyDomainInfo";
-import Header from "../components/common/Header";
+import { getDnsRecords } from "../app/redux/features/actions/actions";
 
 const VerifyDomain = () => {
   const navigate = useNavigate();
   const [domain, setDomain] = React.useState("thefuturevision.com");
   const [openDelete, setOpenDelete] = React.useState(false);
+  const { userInfo } = useSelector((state) => state.auth);
+  const { activeCompany } = useSelector((state) => state.user);
+  const { selectedDomain } = useSelector((state) => state.domain);
+  const [spfRecord, setSpfRecord] = React.useState("");
+  const [dkimRecord, setDkimRecord] = React.useState("");
 
   const handleCloseDelete = () => {
     setOpenDelete(false);
   };
+
+  useEffect(() => {
+    const fetchDnsRecords = async () => {
+      const data = await getDnsRecords(
+        selectedDomain,
+        activeCompany.id,
+        userInfo.token
+      );
+      setSpfRecord(data.data.data.spf);
+      setDkimRecord(data.data.data.dkim);
+    };
+    fetchDnsRecords();
+  }, []);
+
   // TODO: FIX MOBILE VIEW
   return (
     <>
@@ -69,7 +89,7 @@ const VerifyDomain = () => {
             <Stack spacing={2} direction="row" alignItems="center">
               <LooksOneIcon sx={{ fontSize: 60, color: "#00a3b1" }} />
               <VerifyDomainTxt
-                mainTxt={domain}
+                mainTxt={selectedDomain}
                 secondaryTxt={domainVerificationText.domainText}
               />
             </Stack>
@@ -78,7 +98,7 @@ const VerifyDomain = () => {
               <VerifyDomainTxt
                 mainTxt={"SPF Record"}
                 secondaryTxt={domainVerificationText.spfText}
-                textField={"v=spf1 include:_spf.vsend.net ~all"}
+                textField={spfRecord}
               />
             </Stack>
             <Stack spacing={2} direction="row" alignItems="center">
@@ -86,60 +106,8 @@ const VerifyDomain = () => {
               <VerifyDomainTxt
                 mainTxt={"DKIM Record"}
                 secondaryTxt={domainVerificationText.dkimText}
-                textField={
-                  "v=DKIM1;t=s;p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDTPve0ZS3adzRf2E2fFyG0yUdtHrA2M6qST74xSPqK/tlSytsr53cCjrM+bgA0+GNA+nMlhhOb1PwxFZJjpWyyLz6opWz3Daw94p9A2O3Qv7yE1gEtnsak5opFLsS9ZjpeXIhQdCeAcX136jc0GWCW8iYvLS1mRP452hPp90dYhQIDAQAB"
-                }
+                textField={"v=DKIM1;t=s;p=" + dkimRecord}
               />
-            </Stack>
-            <Stack spacing={2} direction="row" alignItems="center">
-              <Looks4Icon sx={{ fontSize: 60, color: "#00a3b1" }} />
-              <Stack direction="row">
-                <Stack spacing={1}>
-                  <Typography variant="h5" sx={{ fontWeight: "700" }}>
-                    Return Path Record
-                  </Typography>
-                  <Stack
-                    spacing={1}
-                    direction="row"
-                    alignItems="center"
-                    justifyContent="space-evenly"
-                    sx={{ width: "800px" }}
-                  >
-                    <Stack spacing={1}>
-                      <Typography
-                        variant="subtitle2"
-                        sx={{ fontWeight: "500", color: "#535353de" }}
-                      >
-                        Create a CNAME Record
-                      </Typography>
-                      <Tooltip title="Click to copy" placement="top">
-                        <CustomTextField
-                          onClick={() => {
-                            navigator.clipboard.writeText(`mta.${domain}`);
-                          }}
-                          value={"mta." + domain}
-                        />
-                      </Tooltip>
-                    </Stack>
-                    <Stack spacing={1}>
-                      <Typography
-                        variant="subtitle2"
-                        sx={{ fontWeight: "500", color: "#535353de" }}
-                      >
-                        Record Value
-                      </Typography>
-                      <Tooltip title="Click to copy" placement="top">
-                        <CustomTextField
-                          onClick={() => {
-                            navigator.clipboard.writeText("vsend.com");
-                          }}
-                          value={"vsend.com"}
-                        />
-                      </Tooltip>
-                    </Stack>
-                  </Stack>
-                </Stack>
-              </Stack>
             </Stack>
             <Divider variant="middle" />
             <Stack

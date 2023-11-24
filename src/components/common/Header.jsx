@@ -6,17 +6,28 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import logo from "../../assets/images/logo.png";
 import HeaderMenu from "./HeaderMenu";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import ExpandCircleDownIcon from "@mui/icons-material/ExpandCircleDown";
 import AccountsDialog from "./AccountsDialog";
+import { useSelector } from "react-redux";
 
 const Header = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [openAccountsDialog, setOpenAccountsDialog] = useState(false);
   const open = Boolean(anchorEl);
+
+  const { userInfo } = useSelector((state) => state.auth);
+
+  const { activeCompany } = useSelector((state) => state.user);
+
+  useEffect(() => {
+    if (!activeCompany) {
+      setOpenAccountsDialog(true);
+    }
+  }, [userInfo, activeCompany]);
 
   const handleCloseAccountsDialog = () => {
     setOpenAccountsDialog(false);
@@ -47,7 +58,7 @@ const Header = () => {
               <img src={logo} alt="logo" style={{ width: 40, height: 40 }} />
               <Stack alignItems="flex-start">
                 <Typography variant="h6" sx={{ fontWeight: "500" }}>
-                  FutureVision
+                  {activeCompany?.name}
                 </Typography>
                 <Typography variant="subtitle2" sx={{ fontWeight: "400" }}>
                   Subscription: Basic
@@ -92,10 +103,10 @@ const Header = () => {
           <Stack direction="row" spacing={1} alignItems="center">
             <Stack sx={{ alignItems: { md: "flex-end", sm: "flex-start" } }}>
               <Typography variant="h6" sx={{ fontWeight: "500" }}>
-                Test Name
+                {userInfo?.name}
               </Typography>
               <Typography variant="subtitle2" sx={{ fontWeight: "400" }}>
-                test@thefuturevision.com
+                {userInfo?.email}
               </Typography>
             </Stack>
             <img src={logo} alt="logo" style={{ width: 40, height: 40 }} />
@@ -106,6 +117,7 @@ const Header = () => {
         </Grid>
         <HeaderMenu anchor={anchorEl} open={open} close={handleClose} />
         <AccountsDialog
+          users={userInfo?.company}
           open={openAccountsDialog}
           close={handleCloseAccountsDialog}
         />
