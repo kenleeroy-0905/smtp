@@ -218,6 +218,7 @@ const EmailVerificationStatus = () => {
                 ? "success"
                 : "error"
             }
+            handleClose={() => setIsError(false)}
           />
         </Box>
       )}

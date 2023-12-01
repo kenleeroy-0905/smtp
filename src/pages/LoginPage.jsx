@@ -306,6 +306,7 @@ const LoginPage = () => {
         open={isError}
         message={errorMessage}
         severity={"error"}
+        handleClose={() => setIsError(false)}
       />
     </Box>
   );

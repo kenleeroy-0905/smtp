@@ -1,22 +1,6 @@
-import {
-  Box,
-  Button,
-  Grid,
-  List,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Menu,
-  MenuItem,
-  Stack,
-  Typography,
-} from "@mui/material";
+import { Box, Button, Grid, Stack, Typography } from "@mui/material";
 import React, { useState } from "react";
 import MarkEmailReadIcon from "@mui/icons-material/MarkEmailRead";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-
-import { viewOptions } from "../../assets/utils";
-import StatBox from "./StatBox";
 
 const HomeComponent = () => {
   const [anchorEl, setAnchorEl] = useState(null);
