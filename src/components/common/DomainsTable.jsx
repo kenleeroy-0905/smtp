@@ -23,7 +23,6 @@ const DomainsTable = () => {
         verified: domain.status,
       }));
       setRows(domains);
-      console.log(domains);
     }
   }, [activeCompany]);
 

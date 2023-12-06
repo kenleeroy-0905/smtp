@@ -84,7 +84,7 @@ const Sidebar = ({ sidebarWidth }) => {
 
   const logOut = () => {
     dispatch(logout());
-    navigate("/");
+    navigate("/login");
   };
 
   const MenuItem = (props) => {

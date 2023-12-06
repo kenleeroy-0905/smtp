@@ -95,7 +95,7 @@ export const domainVerificationText = {
   spfText:
     "It has been integrated with any existing SPF record on your domain. If you don't have an SPF record yet, generate a new TXT record for your domain name using this value:",
   dkimText:
-    "Create a TXT record for vsend._domainkey.thefuturevision.com with this value:",
+    "Create a TXT record for default._domainkey.thefuturevision.com with this value:",
 };
 
 export const CustomTextField = styled(TextField)({

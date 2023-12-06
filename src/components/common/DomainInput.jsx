@@ -12,9 +12,11 @@ import CustomizedSnackbar from "./Snackbar";
 import { setChosenDomain } from "../../app/redux/features/actions/actions";
 import { LoadingButton } from "@mui/lab";
 import SendIcon from "@mui/icons-material/Send";
+import { useNavigate } from "react-router-dom";
 
 const DomainInput = ({ open, close, next, title, type }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { userInfo } = useSelector((state) => state.auth);
   const { activeCompany } = useSelector((state) => state.user);
   const [validDomain, setValidDomain] = React.useState(false);
@@ -54,12 +56,15 @@ const DomainInput = ({ open, close, next, title, type }) => {
     );
     if (data.data.message === "Successfully add domain") {
       setIsLoading(false);
-      setMessage(data.data.message);
+      setMessage("Domain added successfully!");
       setSeverity("success");
       setIsError(true);
       if (next) {
         dispatch(setSelectedDomain(domain));
         next();
+      } else {
+        dispatch(setSelectedDomain(domain));
+        navigate("/dashboard/verify-domain");
       }
       close();
     } else {
@@ -68,11 +73,6 @@ const DomainInput = ({ open, close, next, title, type }) => {
       setSeverity("error");
       setIsLoading(false);
     }
-
-    // if (next) {
-    //   next();
-    // }
-    // close();
   };
 
   return (

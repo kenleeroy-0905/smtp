@@ -1,10 +1,23 @@
 import { Grid } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import VerificationComponent from "../components/common/VerificationComponent";
 import HomeComponent from "../components/common/HomeComponent";
+import { useSelector } from "react-redux";
 
 const DashboardPage = () => {
   const [isVerified, setIsVerified] = useState(false);
+  const { activeCompany } = useSelector((state) => state.user);
+
+  useEffect(() => {
+    if (activeCompany) {
+      const domains = activeCompany.domain?.filter(
+        (domain) => domain.status === "active"
+      );
+      if (domains.length > 0) {
+        setIsVerified(true);
+      }
+    }
+  }, [activeCompany]);
   return (
     <>
       <Grid

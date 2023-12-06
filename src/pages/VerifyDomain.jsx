@@ -1,13 +1,6 @@
-import {
-  Grid,
-  Button,
-  Typography,
-  Stack,
-  Tooltip,
-  Divider,
-} from "@mui/material";
-import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { Grid, Button, Typography, Stack, Divider } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import Link from "@mui/material/Link";
 import VerifyDomainTxt from "../components/common/VerifyDomainTxt";
@@ -16,24 +9,37 @@ import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 import LooksOneIcon from "@mui/icons-material/LooksOne";
 import LooksTwoIcon from "@mui/icons-material/LooksTwo";
 import Looks3Icon from "@mui/icons-material/Looks3";
-import Looks4Icon from "@mui/icons-material/Looks4";
-import { CustomTextField } from "../assets/utils";
+import SendIcon from "@mui/icons-material/Send";
 import DeleteDialog from "../components/common/DeleteDialog";
 import VerifyDomainInfo from "../components/common/VerifyDomainInfo";
-import { getDnsRecords } from "../app/redux/features/actions/actions";
+import {
+  getDnsRecords,
+  verifyDomain,
+} from "../app/redux/features/actions/actions";
+import { LoadingButton } from "@mui/lab";
+import CustomizedSnackbar from "../components/common/Snackbar";
 
 const VerifyDomain = () => {
   const navigate = useNavigate();
-  const [domain, setDomain] = React.useState("thefuturevision.com");
-  const [openDelete, setOpenDelete] = React.useState(false);
+  const [domain, setDomain] = useState("");
+  const [openDelete, setOpenDelete] = useState(false);
   const { userInfo } = useSelector((state) => state.auth);
   const { activeCompany } = useSelector((state) => state.user);
   const { selectedDomain } = useSelector((state) => state.domain);
-  const [spfRecord, setSpfRecord] = React.useState("");
-  const [dkimRecord, setDkimRecord] = React.useState("");
+  const [spfRecord, setSpfRecord] = useState("");
+  const [dkimRecord, setDkimRecord] = useState("");
+  const [domainId, setDomainId] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isOpenSnackbar, setIsOpenSnackbar] = useState(false);
+  const [message, setMessage] = useState("");
+  const [severity, setSeverity] = useState("");
 
   const handleCloseDelete = () => {
     setOpenDelete(false);
+  };
+
+  const handleCloseSnackbar = () => {
+    setIsOpenSnackbar(false);
   };
 
   useEffect(() => {
@@ -43,11 +49,39 @@ const VerifyDomain = () => {
         activeCompany.id,
         userInfo.token
       );
+      setDomain(data.data.data.domain_name);
       setSpfRecord(data.data.data.spf);
       setDkimRecord(data.data.data.dkim);
+      setDomainId(data.data.data.id);
     };
     fetchDnsRecords();
   }, []);
+
+  const handleVerifyDomain = async () => {
+    setIsLoading(true);
+    try {
+      const response = await verifyDomain(
+        domainId,
+        activeCompany.id,
+        userInfo.token
+      );
+      console.log(response);
+      if (response.data.message === "Domain Verified") {
+        setMessage(response.data.message);
+        setSeverity("success");
+        setIsOpenSnackbar(true);
+        setIsLoading(false);
+        navigate("/domains");
+      } else {
+        setMessage(response.data.message);
+        setSeverity("error");
+        setIsOpenSnackbar(true);
+        setIsLoading(false);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   // TODO: FIX MOBILE VIEW
   return (
@@ -105,7 +139,7 @@ const VerifyDomain = () => {
               <Looks3Icon sx={{ fontSize: 60, color: "#00a3b1" }} />
               <VerifyDomainTxt
                 mainTxt={"DKIM Record"}
-                secondaryTxt={domainVerificationText.dkimText}
+                secondaryTxt={`Create a TXT record for default._domainkey.${selectedDomain} with the value below:`}
                 textField={"v=DKIM1;t=s;p=" + dkimRecord}
               />
             </Stack>
@@ -116,18 +150,22 @@ const VerifyDomain = () => {
               justifyContent="space-between"
               alignItems="center"
             >
-              <Button
+              <LoadingButton
+                loading={isLoading}
+                loadingPosition="start"
+                startIcon={<SendIcon />}
+                variant="outlined"
                 sx={{
-                  backgroundColor: "#154b69",
+                  bgcolor: "#154b69",
+                  color: "#fff",
                   "&:hover": {
                     backgroundColor: "#00a3b1",
                   },
                 }}
-                variant="contained"
-                onClick={() => navigate("/dashboard")}
+                onClick={() => handleVerifyDomain()}
               >
                 Verify Domain
-              </Button>
+              </LoadingButton>
               <Button
                 sx={{
                   backgroundColor: "red",
@@ -203,6 +241,12 @@ const VerifyDomain = () => {
         open={openDelete}
         close={handleCloseDelete}
         title={domain}
+      />
+      <CustomizedSnackbar
+        open={isOpenSnackbar}
+        message={message}
+        severity={severity}
+        handleClose={handleCloseSnackbar}
       />
     </>
   );
