@@ -25,6 +25,10 @@ import { Link, useNavigate } from "react-router-dom";
 import Animate from "../components/common/Animate";
 import SimpleBackdrop from "../components/common/Backdrop";
 import { useDispatch, useSelector } from "react-redux";
+import {
+  useLoginMutation,
+  useResendEmailVerificationMutation,
+} from "../app/redux/features/slices/api/usersApiSlice";
 import { setCredentials } from "../app/redux/features/slices/auth/authSlice";
 import { fetchActiveCompany } from "../assets/utils";
 import { setActiveCompany } from "../app/redux/features/slices/user/userSlice";
@@ -41,6 +45,7 @@ const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isError, setIsError] = useState(false);
+  const [severity, setSeverity] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
   const { userInfo } = useSelector((state) => state.auth);
@@ -50,25 +55,23 @@ const LoginPage = () => {
       setIsLoading(true);
       setTimeout(() => {
         navigate("/dashboard");
-      }, 500);
+      }, 1000);
     }
   }, [userInfo, navigate]);
 
-  const resendVerificationEmail = async (tokenData) => {
+  const [resendEmailVerification] = useResendEmailVerificationMutation();
+
+  const resendVerificationEmail = async () => {
     try {
-      console.log(tokenData);
-      await axios
-        .post("/user/resend-verification.php", { token: tokenData })
-        .then((res) => {
-          console.log(res);
-          setOpen(false);
-          setTimeout(() => {
-            navigate("/");
-          }, 500);
-        })
-        .catch((err) => console.log(err));
+      const res = await resendEmailVerification({ token }).unwrap();
+      setIsError(true);
+      setSeverity("success");
+      setErrorMessage("Verification email sent successfully");
+      setTimeout(() => {
+        setOpen(false);
+      }, 1000);
     } catch (err) {
-      return err;
+      return console.log(err?.data?.message || err?.error);
     }
   };
 
@@ -76,38 +79,41 @@ const LoginPage = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const onSignin = async (e) => {
+  const [login] = useLoginMutation();
+
+  const onSignIn = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     const { email, password } = formData;
-
-    const data = {
-      email: email,
-      password: password,
-    };
-    await axios
-      .post("/user/login.php", data)
-      .then((res) => {
-        const data = res.data.data;
-        if (data.email_verify !== "true") {
+    try {
+      const res = await login({ email, password }).unwrap();
+      if (res.status === "Success") {
+        if (res.data.email_verify !== "true") {
           setIsLoading(false);
-          setToken(data.token);
+          setToken(res.data.token);
           setOpen(true);
+          setSeverity("success");
+          setErrorMessage(res.message);
         } else {
-          dispatch(setCredentials(data));
-          dispatch(setActiveCompany(fetchActiveCompany(data.company)));
+          dispatch(setCredentials(res.data));
+          dispatch(setActiveCompany(fetchActiveCompany(res.data.company)));
+          setIsError(true);
           setIsLoading(false);
+          setSeverity("success");
+          setErrorMessage(res.message);
           setTimeout(() => {
             navigate("/dashboard");
           }, 1000);
         }
-      })
-      .catch((err) => {
-        console.log(err.data);
+      } else {
         setIsError(true);
-        setErrorMessage("Wrong email or Password! Please try again.");
+        setSeverity("error");
+        setErrorMessage("Incorrect email or password");
         setIsLoading(false);
-      });
+      }
+    } catch (err) {
+      return console.log(err?.data?.message || err?.error);
+    }
   };
 
   return (
@@ -186,7 +192,7 @@ const LoginPage = () => {
                 component="form"
                 maxWidth={400}
                 width="100%"
-                onSubmit={onSignin}
+                onSubmit={onSignIn}
               >
                 <Stack spacing={3}>
                   <TextField
@@ -271,6 +277,7 @@ const LoginPage = () => {
         open={open}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
+        onClick={() => setOpen(false)}
       >
         <DialogTitle id="alert-dialog-title" sx={{ color: "#d32f2f" }}>
           {"Email is not verified!"}
@@ -287,7 +294,7 @@ const LoginPage = () => {
         <DialogActions>
           <Button
             onClick={() => {
-              resendVerificationEmail(token);
+              resendVerificationEmail();
             }}
             autoFocus
             sx={{
@@ -305,7 +312,7 @@ const LoginPage = () => {
       <CustomizedSnackbar
         open={isError}
         message={errorMessage}
-        severity={"error"}
+        severity={severity}
         handleClose={() => setIsError(false)}
       />
     </Box>

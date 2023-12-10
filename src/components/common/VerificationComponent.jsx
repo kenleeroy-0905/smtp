@@ -146,7 +146,7 @@ const VerificationComponent = () => {
                   variant="h5"
                   sx={{ fontWeight: 500, textDecoration: "underline" }}
                 >
-                  {selectedDomain}
+                  {selectedDomain?.domain}
                 </Typography>
               </Stack>
 

@@ -8,27 +8,31 @@ import logo from "../../assets/images/logo.png";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { setSelectedDomain } from "../../app/redux/features/slices/domain/domainSlice";
+import { useDomainListQuery } from "../../app/redux/features/slices/api/usersApiSlice";
 
 const DomainsTable = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { activeCompany } = useSelector((state) => state.user);
+  const { userInfo } = useSelector((state) => state.auth);
+
   const [rows, setRows] = useState([]);
+
+  const { data, isLoading } = useDomainListQuery({
+    id: activeCompany.id,
+    token: userInfo.token,
+  });
 
   useEffect(() => {
     if (activeCompany) {
-      const domains = activeCompany.domain?.map((domain) => ({
-        id: domain.id,
-        domain: domain.domain_name,
-        verified: domain.status,
-      }));
-      setRows(domains);
+      setRows(data?.data);
     }
-  }, [activeCompany]);
+    console.log(rows);
+  }, [data, activeCompany]);
 
   const columns = [
     {
-      field: "domain",
+      field: "domain_name",
       headerName: "Domain Name",
       width: 250,
       headerAlign: "center",
@@ -54,12 +58,12 @@ const DomainsTable = () => {
           >
             <img src={logo} alt="domain" style={{ width: 20, height: 20 }} />
           </div>
-          <h3>{params.value}</h3>
+          <h3>{params?.value}</h3>
         </div>
       ),
     },
     {
-      field: "verified",
+      field: "status",
       headerName: "Status",
       width: 250,
       headerAlign: "center",
@@ -67,7 +71,7 @@ const DomainsTable = () => {
       renderCell: (params) => (
         <div style={{ textAlign: "center" }}>
           <span>
-            {params.row.verified === "active" ? (
+            {params?.row.status === "active" ? (
               <div
                 style={{
                   display: "flex",
@@ -106,7 +110,7 @@ const DomainsTable = () => {
       width: 350,
       headerAlign: "center",
       align: "center",
-      renderCell: (params) => (
+      renderCell: () => (
         <div
           style={{
             display: "flex",
@@ -138,7 +142,7 @@ const DomainsTable = () => {
       width: 350,
       headerAlign: "center",
       align: "center",
-      renderCell: (params) => (
+      renderCell: () => (
         <div
           style={{
             display: "flex",
@@ -173,7 +177,7 @@ const DomainsTable = () => {
       align: "right",
       renderCell: (params) => (
         <div>
-          {params.row.verified === "active" ? (
+          {params?.row.status === "active" ? (
             <Button
               variant="contained"
               sx={{
@@ -195,7 +199,7 @@ const DomainsTable = () => {
                 },
               }}
               onClick={() => {
-                dispatch(setSelectedDomain(params.row.domain));
+                // dispatch(setSelectedDomain(params?.row.domain));
                 navigate("/dashboard/verify-domain");
               }}
             >

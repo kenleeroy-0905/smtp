@@ -1,6 +1,6 @@
 import { Grid, Button, Typography, Stack, Divider } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import Link from "@mui/material/Link";
 import VerifyDomainTxt from "../components/common/VerifyDomainTxt";
@@ -12,20 +12,23 @@ import Looks3Icon from "@mui/icons-material/Looks3";
 import SendIcon from "@mui/icons-material/Send";
 import DeleteDialog from "../components/common/DeleteDialog";
 import VerifyDomainInfo from "../components/common/VerifyDomainInfo";
-import {
-  getDnsRecords,
-  verifyDomain,
-} from "../app/redux/features/actions/actions";
 import { LoadingButton } from "@mui/lab";
 import CustomizedSnackbar from "../components/common/Snackbar";
+import {
+  useGetDnsRecordsQuery,
+  useVerifyDomainMutation,
+} from "../app/redux/features/slices/api/usersApiSlice";
+import { setSelectedDomain } from "../app/redux/features/slices/domain/domainSlice";
 
 const VerifyDomain = () => {
   const navigate = useNavigate();
-  const [domain, setDomain] = useState("");
-  const [openDelete, setOpenDelete] = useState(false);
+  const dispatch = useDispatch();
   const { userInfo } = useSelector((state) => state.auth);
   const { activeCompany } = useSelector((state) => state.user);
   const { selectedDomain } = useSelector((state) => state.domain);
+
+  const [domain, setDomain] = useState("");
+  const [openDelete, setOpenDelete] = useState(false);
   const [spfRecord, setSpfRecord] = useState("");
   const [dkimRecord, setDkimRecord] = useState("");
   const [domainId, setDomainId] = useState("");
@@ -42,32 +45,24 @@ const VerifyDomain = () => {
     setIsOpenSnackbar(false);
   };
 
-  useEffect(() => {
-    const fetchDnsRecords = async () => {
-      const data = await getDnsRecords(
-        selectedDomain,
-        activeCompany.id,
-        userInfo.token
-      );
-      setDomain(data.data.data.domain_name);
-      setSpfRecord(data.data.data.spf);
-      setDkimRecord(data.data.data.dkim);
-      setDomainId(data.data.data.id);
-    };
-    fetchDnsRecords();
-  }, []);
+  const { data } = useGetDnsRecordsQuery({
+    domain_id: selectedDomain.id,
+    company_id: activeCompany.id,
+    token: userInfo.token,
+  });
 
+  const [verifyDomain] = useVerifyDomainMutation();
   const handleVerifyDomain = async () => {
     setIsLoading(true);
     try {
-      const response = await verifyDomain(
-        domainId,
-        activeCompany.id,
-        userInfo.token
-      );
-      console.log(response);
-      if (response.data.message === "Domain Verified") {
-        setMessage(response.data.message);
+      const res = await verifyDomain({
+        domain_id: selectedDomain.id,
+        company_id: activeCompany.id,
+        token: userInfo.token,
+      }).unwrap();
+      if (res.message === "Domain Verified") {
+        dispatch(setSelectedDomain(null));
+        setMessage(res.message);
         setSeverity("success");
         setIsOpenSnackbar(true);
         setIsLoading(false);
@@ -77,10 +72,9 @@ const VerifyDomain = () => {
         setSeverity("error");
         setIsOpenSnackbar(true);
         setIsLoading(false);
-        navigate("/domains");
       }
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -124,7 +118,7 @@ const VerifyDomain = () => {
             <Stack spacing={2} direction="row" alignItems="center">
               <LooksOneIcon sx={{ fontSize: 60, color: "#00a3b1" }} />
               <VerifyDomainTxt
-                mainTxt={selectedDomain}
+                mainTxt={data?.data?.domain_name}
                 secondaryTxt={domainVerificationText.domainText}
               />
             </Stack>
@@ -133,15 +127,15 @@ const VerifyDomain = () => {
               <VerifyDomainTxt
                 mainTxt={"SPF Record"}
                 secondaryTxt={domainVerificationText.spfText}
-                textField={spfRecord}
+                textField={data?.data?.spf}
               />
             </Stack>
             <Stack spacing={2} direction="row" alignItems="center">
               <Looks3Icon sx={{ fontSize: 60, color: "#00a3b1" }} />
               <VerifyDomainTxt
                 mainTxt={"DKIM Record"}
-                secondaryTxt={`Create a TXT record for default._domainkey.${selectedDomain} with the value below:`}
-                textField={"v=DKIM1;t=s;p=" + dkimRecord}
+                secondaryTxt={`Create a TXT record for default._domainkey.${data?.data?.domain_name} with the value below:`}
+                textField={"v=DKIM1;t=s;p=" + data?.data?.dkim}
               />
             </Stack>
             <Divider variant="middle" />

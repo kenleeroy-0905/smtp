@@ -13,6 +13,7 @@ import { setChosenDomain } from "../../app/redux/features/actions/actions";
 import { LoadingButton } from "@mui/lab";
 import SendIcon from "@mui/icons-material/Send";
 import { useNavigate } from "react-router-dom";
+import { useAddDomainMutation } from "../../app/redux/features/slices/api/usersApiSlice";
 
 const DomainInput = ({ open, close, next, title, type }) => {
   const dispatch = useDispatch();
@@ -47,31 +48,38 @@ const DomainInput = ({ open, close, next, title, type }) => {
     }
   };
 
+  const [addDomain] = useAddDomainMutation();
+
   const handleNext = async () => {
     setIsLoading(true);
-    const data = await setChosenDomain(
-      domain,
-      activeCompany.id,
-      userInfo.token
-    );
-    if (data.data.message === "Successfully add domain") {
-      setIsLoading(false);
-      setMessage("Domain added successfully!");
-      setSeverity("success");
-      setIsError(true);
-      if (next) {
-        dispatch(setSelectedDomain(domain));
-        next();
+    try {
+      const res = await addDomain({
+        action: "add",
+        domain_name: domain,
+        company_id: activeCompany.id,
+        token: userInfo.token,
+      }).unwrap();
+      if (res.message === "Successfully add domain") {
+        setIsLoading(false);
+        setMessage("Domain added successfully!");
+        setSeverity("success");
+        setIsError(true);
+        if (next) {
+          dispatch(setSelectedDomain(res.data));
+          next();
+        } else {
+          dispatch(setSelectedDomain(res.data));
+          navigate("/dashboard/verify-domain");
+        }
+        close();
       } else {
-        dispatch(setSelectedDomain(domain));
-        navigate("/dashboard/verify-domain");
+        setIsLoading(false);
+        setMessage("Something went wrong! Please try again later.");
+        setSeverity("error");
+        setIsError(true);
       }
-      close();
-    } else {
-      setIsError(true);
-      setMessage(data.data.message);
-      setSeverity("error");
-      setIsLoading(false);
+    } catch (error) {
+      console.log(error);
     }
   };
 

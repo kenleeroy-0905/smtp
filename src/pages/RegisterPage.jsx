@@ -19,6 +19,7 @@ import TaskAltIcon from "@mui/icons-material/TaskAlt";
 import SimpleBackdrop from "../components/common/Backdrop";
 import axios from "axios";
 import CustomizedSnackbar from "../components/common/Snackbar";
+import { useRegisterMutation } from "../app/redux/features/slices/api/usersApiSlice";
 
 const RegisterPage = () => {
   const navigate = useNavigate();
@@ -46,7 +47,9 @@ const RegisterPage = () => {
     setOpen(false);
   };
 
-  const register = (e) => {
+  const [register] = useRegisterMutation();
+
+  const onSubmit = async (e) => {
     e.preventDefault();
     setOpenBackdrop(true);
     const { company, name, email, password } = formData;
@@ -59,32 +62,47 @@ const RegisterPage = () => {
       setMessage("Please fill all the fields");
       setSeverity("error");
     } else {
-      const data = {
-        name: name,
-        email: email,
-        password: password,
-        agree_condition: 1,
-        company_name: company,
-      };
-      axios
-        .post("/user/signup.php", data)
-        .then((res) => {
-          console.log(res);
-          setOpenBackdrop(false);
-          setOpen(true);
-          setMessage("Application submitted successfully");
-          setSeverity("success");
-          setTimeout(() => {
-            navigate("/");
-          }, 1000);
-        })
-        .catch((err) => {
-          console.log(err);
-          setOpenBackdrop(false);
-          setOpen(true);
-          setMessage("Error in submitting registration");
-          setSeverity("error");
-        });
+      const agree_condition = 1;
+      try {
+        const res = await register({
+          company,
+          name,
+          email,
+          password,
+          agree_condition,
+        }).unwrap();
+        setOpenBackdrop(false);
+        setOpen(true);
+        setMessage("Application submitted successfully");
+        setSeverity("success");
+        setTimeout(() => {
+          navigate("/");
+        }, 1000);
+      } catch (err) {
+        setOpenBackdrop(false);
+        setOpen(true);
+        setMessage("Error in submitting registration");
+        setSeverity("error");
+      }
+      // axios
+      //   .post("/user/signup.php", data)
+      //   .then((res) => {
+      //     console.log(res);
+      //     setOpenBackdrop(false);
+      //     setOpen(true);
+      //     setMessage("Application submitted successfully");
+      //     setSeverity("success");
+      //     setTimeout(() => {
+      //       navigate("/");
+      //     }, 1000);
+      //   })
+      //   .catch((err) => {
+      //     console.log(err);
+      //     setOpenBackdrop(false);
+      //     setOpen(true);
+      //     setMessage("Error in submitting registration");
+      //     setSeverity("error");
+      //   });
     }
   };
 
@@ -200,7 +218,7 @@ const RegisterPage = () => {
                 component="form"
                 maxWidth={400}
                 width="100%"
-                onSubmit={register}
+                onSubmit={onSubmit}
               >
                 <Stack spacing={3}>
                   <CustomTextFieldComponent
@@ -304,7 +322,9 @@ const RegisterPage = () => {
                     required
                     control={<Checkbox checked={checked} />}
                     label="I agree to all the Terms of Use"
-                    onChange={() => setChecked(!checked)}
+                    onChange={() => {
+                      setChecked(!checked);
+                    }}
                   />
                   <Button
                     disabled={checked ? false : true}
