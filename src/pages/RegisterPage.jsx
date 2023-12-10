@@ -75,7 +75,7 @@ const RegisterPage = () => {
           setMessage("Application submitted successfully");
           setSeverity("success");
           setTimeout(() => {
-            navigate("/login");
+            navigate("/");
           }, 1000);
         })
         .catch((err) => {

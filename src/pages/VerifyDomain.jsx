@@ -73,10 +73,11 @@ const VerifyDomain = () => {
         setIsLoading(false);
         navigate("/domains");
       } else {
-        setMessage(response.data.message);
+        setMessage("Can't verify domain. Please check your DNS records");
         setSeverity("error");
         setIsOpenSnackbar(true);
         setIsLoading(false);
+        navigate("/domains");
       }
     } catch (err) {
       console.log(err);

@@ -8,16 +8,16 @@ const DashboardPage = () => {
   const [isVerified, setIsVerified] = useState(false);
   const { activeCompany } = useSelector((state) => state.user);
 
-  useEffect(() => {
-    if (activeCompany) {
-      const domains = activeCompany.domain?.filter(
-        (domain) => domain.status === "active"
-      );
-      if (domains.length > 0) {
-        setIsVerified(true);
-      }
-    }
-  }, [activeCompany]);
+  // useEffect(() => {
+  //   if (activeCompany) {
+  //     const domains = activeCompany.domain?.filter((domain) => {
+  //       return domain.status === "active";
+  //     });
+  //     if (domains.length > 0) {
+  //       setIsVerified(true);
+  //     }
+  //   }
+  // }, [activeCompany]);
   return (
     <>
       <Grid
