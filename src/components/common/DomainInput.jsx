@@ -9,7 +9,6 @@ import DialogTitle from "@mui/material/DialogTitle";
 import { useDispatch, useSelector } from "react-redux";
 import { setSelectedDomain } from "../../app/redux/features/slices/domain/domainSlice";
 import CustomizedSnackbar from "./Snackbar";
-import { setChosenDomain } from "../../app/redux/features/actions/actions";
 import { LoadingButton } from "@mui/lab";
 import SendIcon from "@mui/icons-material/Send";
 import { useNavigate } from "react-router-dom";

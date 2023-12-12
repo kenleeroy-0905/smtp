@@ -29,9 +29,6 @@ const VerifyDomain = () => {
 
   const [domain, setDomain] = useState("");
   const [openDelete, setOpenDelete] = useState(false);
-  const [spfRecord, setSpfRecord] = useState("");
-  const [dkimRecord, setDkimRecord] = useState("");
-  const [domainId, setDomainId] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isOpenSnackbar, setIsOpenSnackbar] = useState(false);
   const [message, setMessage] = useState("");
@@ -91,7 +88,10 @@ const VerifyDomain = () => {
         }}
         variant="contained"
         startIcon={<KeyboardBackspaceIcon />}
-        onClick={() => navigate("/domains")}
+        onClick={() => {
+          dispatch(setSelectedDomain(null));
+          navigate("/domains");
+        }}
       >
         Back to Domains
       </Button>

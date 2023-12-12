@@ -84,25 +84,6 @@ const RegisterPage = () => {
         setMessage("Error in submitting registration");
         setSeverity("error");
       }
-      // axios
-      //   .post("/user/signup.php", data)
-      //   .then((res) => {
-      //     console.log(res);
-      //     setOpenBackdrop(false);
-      //     setOpen(true);
-      //     setMessage("Application submitted successfully");
-      //     setSeverity("success");
-      //     setTimeout(() => {
-      //       navigate("/");
-      //     }, 1000);
-      //   })
-      //   .catch((err) => {
-      //     console.log(err);
-      //     setOpenBackdrop(false);
-      //     setOpen(true);
-      //     setMessage("Error in submitting registration");
-      //     setSeverity("error");
-      //   });
     }
   };
 

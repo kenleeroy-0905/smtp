@@ -2,6 +2,7 @@ import { apiSlice } from "./apiSlice";
 
 const userUrl = "/user";
 const domainUrl = "/domain";
+const smtpUrl = "/smtp";
 
 export const userApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -54,6 +55,13 @@ export const userApiSlice = apiSlice.injectEndpoints({
         body: data,
       }),
     }),
+    createSmtpUser: builder.mutation({
+      query: (data) => ({
+        url: `${smtpUrl}/create_user.php`,
+        method: "POST",
+        body: data,
+      }),
+    }),
   }),
 });
 
@@ -65,4 +73,5 @@ export const {
   useGetDnsRecordsQuery,
   useVerifyDomainMutation,
   useDomainListQuery,
+  useCreateSmtpUserMutation,
 } = userApiSlice;

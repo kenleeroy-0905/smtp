@@ -11,8 +11,8 @@ const DashboardPage = () => {
   const { userInfo } = useSelector((state) => state.auth);
 
   const { data } = useDomainListQuery({
-    id: activeCompany.id,
-    token: userInfo.token,
+    id: activeCompany?.id,
+    token: userInfo?.token,
   });
 
   useEffect(() => {

@@ -18,7 +18,7 @@ const DomainsTable = () => {
 
   const [rows, setRows] = useState([]);
 
-  const { data, isLoading } = useDomainListQuery({
+  const { data } = useDomainListQuery({
     id: activeCompany.id,
     token: userInfo.token,
   });
@@ -27,7 +27,6 @@ const DomainsTable = () => {
     if (activeCompany) {
       setRows(data?.data);
     }
-    console.log(rows);
   }, [data, activeCompany]);
 
   const columns = [
@@ -186,6 +185,10 @@ const DomainsTable = () => {
                   backgroundColor: "#00a3b1",
                 },
               }}
+              onClick={() => {
+                dispatch(setSelectedDomain(params?.row));
+                navigate("/dashboard/manage-domain");
+              }}
             >
               Manage
             </Button>
@@ -199,7 +202,7 @@ const DomainsTable = () => {
                 },
               }}
               onClick={() => {
-                // dispatch(setSelectedDomain(params?.row.domain));
+                dispatch(setSelectedDomain(params?.row));
                 navigate("/dashboard/verify-domain");
               }}
             >

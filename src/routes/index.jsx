@@ -7,6 +7,7 @@ import Domains from "../pages/Domains";
 import VerifyDomain from "../pages/VerifyDomain";
 import RegisterPage from "../pages/RegisterPage";
 import EmailVerificationStatus from "../pages/EmailVerificationStatus";
+import ManageDomain from "../pages/ManageDomain";
 
 export const router = createBrowserRouter([
   {
@@ -40,6 +41,11 @@ export const router = createBrowserRouter([
             path: "verify-domain",
             index: true,
             element: <VerifyDomain />,
+          },
+          {
+            path: "manage-domain",
+            index: true,
+            element: <ManageDomain />,
           },
         ],
       },
