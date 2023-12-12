@@ -3,6 +3,7 @@ import { apiSlice } from "./apiSlice";
 const userUrl = "/user";
 const domainUrl = "/domain";
 const smtpUrl = "/smtp";
+const emailUrl = "/mail";
 
 export const userApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -40,6 +41,7 @@ export const userApiSlice = apiSlice.injectEndpoints({
         method: "POST",
         body: data,
       }),
+      providesTags: ["Domain"],
     }),
     verifyDomain: builder.mutation({
       query: (data) => ({
@@ -54,6 +56,7 @@ export const userApiSlice = apiSlice.injectEndpoints({
         method: "POST",
         body: data,
       }),
+      providesTags: ["Domain"],
     }),
     createSmtpUser: builder.mutation({
       query: (data) => ({
@@ -61,6 +64,31 @@ export const userApiSlice = apiSlice.injectEndpoints({
         method: "POST",
         body: data,
       }),
+      invalidatesTags: ["Domain"],
+    }),
+    editSmtpUser: builder.mutation({
+      query: (data) => ({
+        url: `${smtpUrl}/edit_user.php`,
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["Domain"],
+    }),
+    deleteSmtpUser: builder.mutation({
+      query: (data) => ({
+        url: `${smtpUrl}/delete_user.php`,
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["Domain"],
+    }),
+    getEmailActivity: builder.query({
+      query: (data) => ({
+        url: `${emailUrl}/email_activity.php`,
+        method: "POST",
+        body: data,
+      }),
+      providesTags: ["Email"],
     }),
   }),
 });
@@ -74,4 +102,7 @@ export const {
   useVerifyDomainMutation,
   useDomainListQuery,
   useCreateSmtpUserMutation,
+  useEditSmtpUserMutation,
+  useDeleteSmtpUserMutation,
+  useGetEmailActivityQuery,
 } = userApiSlice;

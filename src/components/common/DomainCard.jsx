@@ -1,20 +1,9 @@
 import { Card, CardContent, Stack, Typography } from "@mui/material";
 import { create } from "@mui/material/styles/createTransitions";
 import React from "react";
+import { formatDate } from "../../assets/utils";
 
 const DomainCard = ({ domainId, createdAt, updatedAt }) => {
-  const formatDate = (date) => {
-    const options = {
-      year: "numeric",
-      month: "long",
-      day: "2-digit",
-      hour: "numeric",
-      minute: "numeric",
-      second: "numeric",
-      hour12: false,
-    };
-    return new Date(date).toLocaleString("en-US", options);
-  };
   return (
     <>
       <Card sx={{ width: "100%", mt: 1, p: 1.5 }}>

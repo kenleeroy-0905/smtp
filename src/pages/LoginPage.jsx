@@ -19,7 +19,6 @@ import {
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { images } from "../assets";
 import { Link, useNavigate } from "react-router-dom";
 import Animate from "../components/common/Animate";
@@ -54,7 +53,7 @@ const LoginPage = () => {
     if (userInfo) {
       setIsLoading(true);
       setTimeout(() => {
-        navigate("/dashboard");
+        navigate("/domains");
       }, 1000);
     }
   }, [userInfo, navigate]);
@@ -102,7 +101,7 @@ const LoginPage = () => {
           setSeverity("success");
           setErrorMessage(res.message);
           setTimeout(() => {
-            navigate("/dashboard");
+            navigate("/domains");
           }, 1000);
         }
       } else {

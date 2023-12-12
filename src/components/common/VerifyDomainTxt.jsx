@@ -1,4 +1,4 @@
-import { Stack, TextField, Tooltip, Typography } from "@mui/material";
+import { Stack, Tooltip, Typography } from "@mui/material";
 import Snackbar from "@mui/material/Snackbar";
 import { CustomTextField } from "../../assets/utils";
 import React, { useState } from "react";
@@ -9,10 +9,9 @@ const VerifyDomainTxt = ({ mainTxt, secondaryTxt, textField }) => {
     navigator.clipboard.writeText(textField);
     setOpen(true);
   };
-
   return (
     <>
-      <Stack spacing={1.5}>
+      <Stack spacing={1.5} sx={{ width: "100%" }}>
         <Typography variant="h5" sx={{ fontWeight: "700" }}>
           {mainTxt}
         </Typography>
@@ -28,7 +27,7 @@ const VerifyDomainTxt = ({ mainTxt, secondaryTxt, textField }) => {
               onClick={handleCopy}
               value={textField}
               id="fullWidth"
-              sx={{ width: "800px" }}
+              sx={{ width: "100%" }}
               multiline
             />
           </Tooltip>

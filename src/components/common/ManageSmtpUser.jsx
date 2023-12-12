@@ -1,6 +1,4 @@
-import React, { useState } from "react";
-import { useGetDnsRecordsQuery } from "../../app/redux/features/slices/api/usersApiSlice";
-import { useSelector } from "react-redux";
+import React, { useEffect, useState } from "react";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Dialog from "@mui/material/Dialog";
@@ -8,52 +6,133 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import { Slide, Stack, Typography } from "@mui/material";
-import { useCreateSmtpUserMutation } from "../../app/redux/features/slices/api/usersApiSlice";
+import { Box, Slide, Stack, Tooltip, Typography } from "@mui/material";
+import { styled } from "@mui/material/styles";
 import { LoadingButton } from "@mui/lab";
 import SendIcon from "@mui/icons-material/Send";
+
+import { CustomTextField } from "../../assets/utils";
+import { useEditSmtpUserMutation } from "../../app/redux/features/slices/api/usersApiSlice";
+import { useSelector } from "react-redux";
+import CustomizedSnackbar from "./Snackbar";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="down" ref={ref} {...props} />;
 });
 
-const ManageSmtpUser = ({ open, closeSmtp, domainID, smtpUsername }) => {
-  const { userInfo } = useSelector((state) => state.auth);
-  const { activeCompany } = useSelector((state) => state.user);
+const BootstrapDialog = styled(Dialog)(({ theme }) => ({
+  "& .MuiDialogContent-root": {
+    padding: theme.spacing(3),
+    height: "100%",
+  },
+}));
 
-  const [isLoading, setIsLoading] = useState(false);
+const StyledTextField = styled(TextField)({
+  "& value.Mui-focused": {
+    color: "#00a3b1",
+  },
+  "& .MuiInput-underline:after": {
+    borderBottomColor: "#00a3b1",
+  },
+  "& .MuiOutlinedInput-root": {
+    "& fieldset": {
+      borderColor: "#00a3b1",
+    },
+    "&:hover fieldset": {
+      borderColor: "#00a3b1",
+    },
+    "&.Mui-focused fieldset": {
+      borderColor: "#00a3b1",
+    },
+    "& .MuiInputBase-input": {
+      color: "#00a3b1",
+      textAlign: "left",
+      padding: "0px 8px",
+    },
+  },
+});
+
+const ManageSmtpUser = ({
+  open,
+  closeSmtp,
+  domainID,
+  name,
+  username,
+  password,
+  id,
+}) => {
+  const userInfo = useSelector((state) => state.auth.userInfo);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [newSmtpUsername, setNewSmtpUsername] = useState("");
+  const [isOpenSnackbar, setIsOpenSnackbar] = useState(false);
+  const [message, setMessage] = useState("");
+  const [severity, setSeverity] = useState("");
 
-  const { data, isSuccess } = useGetDnsRecordsQuery({
-    domain_id: domainID,
-    company_id: activeCompany.id,
-    token: userInfo.token,
-  });
-
-  console.log(data);
+  useEffect(() => {
+    setNewSmtpUsername(name);
+  }, [id]);
 
   const handleClose = () => {
     closeSmtp();
   };
-  const handleSave = () => {};
+
+  const handleCopy = (value) => {
+    navigator.clipboard.writeText(value);
+  };
+
+  const handleCloseSnackBar = () => {
+    setIsOpenSnackbar(false);
+  };
+
+  const [editSmtpUser] = useEditSmtpUserMutation();
+
+  const handleSave = async () => {
+    setIsSubmitting(true);
+    if (name !== newSmtpUsername) {
+      try {
+        const res = await editSmtpUser({
+          name: newSmtpUsername,
+          smtp_id: id,
+          domain_id: domainID,
+          token: userInfo.token,
+        }).unwrap();
+        if (res.status === "success") {
+          setIsSubmitting(false);
+          setIsOpenSnackbar(true);
+          setMessage("SMTP user successfully updated");
+          setSeverity("success");
+          handleClose();
+        } else {
+          setIsSubmitting(false);
+          setIsOpenSnackbar(true);
+          setMessage("There's an error updating the SMTP user");
+          setSeverity("error");
+          handleClose();
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      handleClose();
+    }
+  };
   return (
     <>
-      <Dialog
+      <BootstrapDialog
         open={open}
         onClose={handleClose}
         TransitionComponent={Transition}
         keepMounted
-        aria-describedby="alert-dialog-slide-description"
-        maxWidth="lg"
-        maxHeight="xl"
+        aria-labelledby="customized-dialog-title"
+        maxWidth="md"
       >
         <DialogTitle>
-          <Typography variant="h6" sx={{ fontWeight: "700" }}>
+          <Typography variant="h4" sx={{ fontWeight: "700" }}>
             Manage SMTP user
           </Typography>
         </DialogTitle>
         <DialogContent>
-          <DialogContentText>
+          <DialogContentText sx={{ mb: "1rem" }}>
             <Typography variant="body2" sx={{ fontWeight: "400" }}>
               Employ your SMTP credentials for email sending, account
               authentication, and data tracking. The SMTP relay is an excellent
@@ -63,21 +142,163 @@ const ManageSmtpUser = ({ open, closeSmtp, domainID, smtpUsername }) => {
             </Typography>
           </DialogContentText>
           <Stack justifyContent={"center"} alignItems={"start"} spacing={3}>
-            <Stack alignItems={"start"} justifyContent={"flex-start"} mt={2}>
+            <Stack
+              alignItems={"start"}
+              justifyContent={"flex-start"}
+              sx={{ width: "100%" }}
+            >
               <Typography variant="h6" sx={{ fontWeight: "500" }}>
                 SMTP Username
               </Typography>
-              <TextField
+              <CustomTextField
                 onChange={(e) => setNewSmtpUsername(e.target.value)}
+                value={newSmtpUsername}
                 autoFocus
-                margin="dense"
                 id="name"
                 type="text"
                 fullWidth
-                variant="standard"
-                placeholder={smtpUsername}
+                sx={{ width: "100%", height: "max-content" }}
               />
             </Stack>
+            <Box
+              width={"100%"}
+              border={".5px solid #00a3b1"}
+              borderRadius={2}
+              p={2}
+              height={"max-content"}
+            >
+              <Stack
+                justifyContent={"center"}
+                alignItems={"center"}
+                spacing={2}
+              >
+                <Stack
+                  direction={{ md: "row", sm: "column", xs: "column" }}
+                  justifyContent={"space-between"}
+                  alignItems={"center"}
+                  sx={{ width: "100%" }}
+                >
+                  <Stack
+                    justifyContent={"flex-start"}
+                    alignItems={"start"}
+                    sx={{ width: "100%" }}
+                  >
+                    <Typography variant="body1" sx={{ fontWeight: "400" }}>
+                      Server
+                    </Typography>
+                    <Tooltip title="Click to copy" placement="top">
+                      <StyledTextField
+                        onClick={() => handleCopy("relay2.vision-relay.com")}
+                        value={"relay2.vision-relay.com"}
+                        id="fullWidth"
+                        multiline
+                        disabled
+                        sx={{
+                          width: "80%",
+                          height: "max-content",
+                        }}
+                      />
+                    </Tooltip>
+                  </Stack>
+                  <Stack
+                    justifyContent={"flex-start"}
+                    alignItems={"start"}
+                    sx={{ width: "80%" }}
+                  >
+                    <Stack
+                      direction={"row"}
+                      justifyContent={"space-between"}
+                      alignItems={"center"}
+                      sx={{ width: "100%" }}
+                    >
+                      <Typography variant="body1" sx={{ fontWeight: "400" }}>
+                        Port
+                      </Typography>
+                      <Typography variant="body1" sx={{ fontWeight: "400" }}>
+                        Connection Security: TLS
+                      </Typography>
+                    </Stack>
+
+                    <Tooltip title="Click to copy" placement="top">
+                      <StyledTextField
+                        onClick={() => handleCopy("25")}
+                        value={"25"}
+                        id="fullWidth"
+                        multiline
+                        disabled
+                        sx={{
+                          width: "100%",
+                          height: "max-content",
+                        }}
+                      />
+                    </Tooltip>
+                  </Stack>
+                </Stack>
+                <Stack
+                  direction={{ md: "row", sm: "column", xs: "column" }}
+                  justifyContent={"space-between"}
+                  alignItems={"center"}
+                  sx={{ width: "100%" }}
+                >
+                  <Stack
+                    justifyContent={"flex-start"}
+                    alignItems={"start"}
+                    sx={{ width: "100%" }}
+                  >
+                    <Typography variant="body1" sx={{ fontWeight: "400" }}>
+                      Username
+                    </Typography>
+                    <Tooltip title="Click to copy" placement="top">
+                      <StyledTextField
+                        onClick={() => handleCopy(username)}
+                        value={username}
+                        id="fullWidth"
+                        multiline
+                        disabled
+                        sx={{
+                          width: "80%",
+                          height: "max-content",
+                        }}
+                      />
+                    </Tooltip>
+                  </Stack>
+                  <Stack
+                    justifyContent={"flex-start"}
+                    alignItems={"start"}
+                    sx={{ width: "80%" }}
+                  >
+                    <Stack
+                      direction={"row"}
+                      justifyContent={"space-between"}
+                      alignItems={"center"}
+                      sx={{ width: "100%" }}
+                    >
+                      <Typography variant="body1" sx={{ fontWeight: "400" }}>
+                        Password
+                      </Typography>
+                      <Typography variant="body1" sx={{ fontWeight: "400" }}>
+                        Reset Credentials
+                      </Typography>
+                    </Stack>
+
+                    <Tooltip title="Click to copy" placement="top">
+                      <StyledTextField
+                        type="password"
+                        onClick={() => handleCopy(password)}
+                        value={password}
+                        id="fullWidth"
+                        multiline
+                        disabled
+                        sx={{
+                          width: "100%",
+                          height: "max-content",
+                        }}
+                      />
+                    </Tooltip>
+                  </Stack>
+                </Stack>
+              </Stack>
+            </Box>
           </Stack>
         </DialogContent>
         <DialogActions>
@@ -95,7 +316,7 @@ const ManageSmtpUser = ({ open, closeSmtp, domainID, smtpUsername }) => {
             Cancel
           </Button>
           <LoadingButton
-            loading={isLoading}
+            loading={isSubmitting}
             loadingPosition="start"
             startIcon={<SendIcon />}
             variant="outlined"
@@ -112,7 +333,13 @@ const ManageSmtpUser = ({ open, closeSmtp, domainID, smtpUsername }) => {
             Save
           </LoadingButton>
         </DialogActions>
-      </Dialog>
+      </BootstrapDialog>
+      <CustomizedSnackbar
+        open={isOpenSnackbar}
+        handleClose={handleCloseSnackBar}
+        severity={severity}
+        message={message}
+      />
     </>
   );
 };

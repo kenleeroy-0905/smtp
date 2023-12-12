@@ -10,32 +10,27 @@ import { useNavigate } from "react-router-dom";
 import { setSelectedDomain } from "../../app/redux/features/slices/domain/domainSlice";
 import { useDomainListQuery } from "../../app/redux/features/slices/api/usersApiSlice";
 
-const DomainsTable = () => {
+const DomainsTable = ({ domain }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { activeCompany } = useSelector((state) => state.user);
-  const { userInfo } = useSelector((state) => state.auth);
 
   const [rows, setRows] = useState([]);
 
-  const { data } = useDomainListQuery({
-    id: activeCompany.id,
-    token: userInfo.token,
-  });
-
   useEffect(() => {
-    if (activeCompany) {
-      setRows(data?.data);
+    if (domain) {
+      const newRows = domain.map((row, index) => ({ id: index, ...row }));
+      setRows(newRows);
     }
-  }, [data, activeCompany]);
+    console.log(rows);
+  }, [domain]);
 
   const columns = [
     {
       field: "domain_name",
       headerName: "Domain Name",
-      width: 250,
+      width: 500,
       headerAlign: "center",
-      align: "left",
+      align: "center",
       renderCell: (params) => (
         <div
           style={{
@@ -64,7 +59,7 @@ const DomainsTable = () => {
     {
       field: "status",
       headerName: "Status",
-      width: 250,
+      width: 400,
       headerAlign: "center",
       align: "center",
       renderCell: (params) => (
@@ -103,75 +98,75 @@ const DomainsTable = () => {
         </div>
       ),
     },
-    {
-      field: "sent",
-      headerName: "Sending",
-      width: 350,
-      headerAlign: "center",
-      align: "center",
-      renderCell: () => (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 20,
-          }}
-        >
-          <div style={{ textAlign: "center" }}>
-            <span style={{ fontSize: "1.2rem", fontWeight: "500" }}>
-              0<br></br>
-            </span>
-            <span style={{ fontSize: "1.2rem", fontWeight: "500" }}>Sent</span>
-          </div>
-          <div style={{ textAlign: "center" }}>
-            <span style={{ fontSize: "1.2rem", fontWeight: "500" }}>
-              0<br></br>
-            </span>
-            <span style={{ fontSize: "1.2rem", fontWeight: "500" }}>
-              Delivered
-            </span>
-          </div>
-        </div>
-      ),
-    },
-    {
-      field: "received",
-      headerName: "Receiving",
-      width: 350,
-      headerAlign: "center",
-      align: "center",
-      renderCell: () => (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 20,
-          }}
-        >
-          <div style={{ textAlign: "center" }}>
-            <span style={{ fontSize: "1.2rem", fontWeight: "500" }}>
-              0<br></br>
-            </span>
-            <span style={{ fontSize: "1.2rem", fontWeight: "500" }}>
-              Received
-            </span>
-          </div>
-          <div style={{ textAlign: "center" }}>
-            <span style={{ fontSize: "1.2rem", fontWeight: "500" }}>
-              0<br></br>
-            </span>
-            <span style={{ fontSize: "1.2rem", fontWeight: "500" }}>
-              Rejected
-            </span>
-          </div>
-        </div>
-      ),
-    },
+    // {
+    //   field: "sent",
+    //   headerName: "Sending",
+    //   width: 350,
+    //   headerAlign: "center",
+    //   align: "center",
+    //   renderCell: () => (
+    //     <div
+    //       style={{
+    //         display: "flex",
+    //         alignItems: "center",
+    //         justifyContent: "center",
+    //         gap: 20,
+    //       }}
+    //     >
+    //       <div style={{ textAlign: "center" }}>
+    //         <span style={{ fontSize: "1.2rem", fontWeight: "500" }}>
+    //           0<br></br>
+    //         </span>
+    //         <span style={{ fontSize: "1.2rem", fontWeight: "500" }}>Sent</span>
+    //       </div>
+    //       <div style={{ textAlign: "center" }}>
+    //         <span style={{ fontSize: "1.2rem", fontWeight: "500" }}>
+    //           0<br></br>
+    //         </span>
+    //         <span style={{ fontSize: "1.2rem", fontWeight: "500" }}>
+    //           Delivered
+    //         </span>
+    //       </div>
+    //     </div>
+    //   ),
+    // },
+    // {
+    //   field: "received",
+    //   headerName: "Receiving",
+    //   width: 350,
+    //   headerAlign: "center",
+    //   align: "center",
+    //   renderCell: () => (
+    //     <div
+    //       style={{
+    //         display: "flex",
+    //         alignItems: "center",
+    //         justifyContent: "center",
+    //         gap: 20,
+    //       }}
+    //     >
+    //       <div style={{ textAlign: "center" }}>
+    //         <span style={{ fontSize: "1.2rem", fontWeight: "500" }}>
+    //           0<br></br>
+    //         </span>
+    //         <span style={{ fontSize: "1.2rem", fontWeight: "500" }}>
+    //           Received
+    //         </span>
+    //       </div>
+    //       <div style={{ textAlign: "center" }}>
+    //         <span style={{ fontSize: "1.2rem", fontWeight: "500" }}>
+    //           0<br></br>
+    //         </span>
+    //         <span style={{ fontSize: "1.2rem", fontWeight: "500" }}>
+    //           Rejected
+    //         </span>
+    //       </div>
+    //     </div>
+    //   ),
+    // },
     {
       field: "manage",
-      width: 200,
+      width: 400,
       headerName: "",
       align: "right",
       renderCell: (params) => (

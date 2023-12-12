@@ -1,4 +1,4 @@
-import { Button, Collapse, Grid, Stack, Typography } from "@mui/material";
+import { Box, Button, Collapse, Grid, Stack, Typography } from "@mui/material";
 import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -8,9 +8,17 @@ import DomainCard from "../components/common/DomainCard";
 import DomainDnsDialog from "../components/common/DomainDnsDialog";
 import DomainStatsCard from "../components/common/DomainStatsCard";
 
-import { EnvelopeOpen, PaperPlaneTilt, XCircle } from "@phosphor-icons/react";
+import {
+  EnvelopeOpen,
+  PaperPlaneTilt,
+  SealWarning,
+  XCircle,
+} from "@phosphor-icons/react";
 import { setSelectedDomain } from "../app/redux/features/slices/domain/domainSlice";
 import CreateSmtpUserDialog from "../components/common/CreateSmtpUserDialog";
+import SimpleBackdrop from "../components/common/Backdrop";
+import SmtpUserTable from "../components/common/SmtpUserTable";
+import { NoAccounts } from "@mui/icons-material";
 
 const ManageDomain = () => {
   const navigate = useNavigate();
@@ -36,7 +44,7 @@ const ManageDomain = () => {
     setOpenSmtpUserDialog(false);
   };
 
-  const { data, isSuccess } = useGetDnsRecordsQuery({
+  const { data, isSuccess, isLoading } = useGetDnsRecordsQuery({
     domain_id: selectedDomain.id,
     company_id: activeCompany.id,
     token: userInfo.token,
@@ -44,6 +52,7 @@ const ManageDomain = () => {
 
   return (
     <>
+      {isLoading && <SimpleBackdrop status={isLoading} />}
       <Button
         sx={{
           backgroundColor: "#154b69",
@@ -61,6 +70,7 @@ const ManageDomain = () => {
       >
         Back to Domains
       </Button>
+
       {isSuccess && (
         <>
           <Grid
@@ -135,6 +145,7 @@ const ManageDomain = () => {
           </Grid>
           <Grid
             mt={5}
+            mb={3}
             spacing={2}
             container
             direction={{ xs: "column", md: "row" }}
@@ -180,6 +191,44 @@ const ManageDomain = () => {
             domainID={data?.data?.id}
           />
         </>
+      )}
+
+      {data?.data?.smtp_user?.length > 0 ? (
+        <SmtpUserTable
+          users={data?.data?.smtp_user}
+          domainId={selectedDomain.id}
+        />
+      ) : (
+        <Box
+          width={"100%"}
+          border={".5px solid #00a3b1"}
+          borderRadius={2}
+          p={6}
+          boxShadow={"rgba(0, 0, 0, 0.16) 0px 1px 4px"}
+        >
+          <Stack justifyContent={"center"} alignItems={"center"} spacing={4}>
+            <Box
+              p={2}
+              backgroundColor={"#00a3b1"}
+              width={"5%"}
+              borderRadius={2}
+              display={"flex"}
+              justifyContent={"center"}
+              alignItems={"center"}
+              height={"70px"}
+            >
+              <SealWarning size={32} color="#fff" />
+            </Box>
+
+            <Typography variant="h5" sx={{ fontWeight: "500" }}>
+              No SMTP User Found
+            </Typography>
+            <Typography variant="body1">
+              Create a new SMTP user to send emails, verify your account, and
+              monitor data.
+            </Typography>
+          </Stack>
+        </Box>
       )}
     </>
   );

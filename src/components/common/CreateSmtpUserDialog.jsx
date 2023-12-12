@@ -10,6 +10,9 @@ import { Slide, Typography } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import SendIcon from "@mui/icons-material/Send";
 import ManageSmtpUser from "./ManageSmtpUser";
+import { useCreateSmtpUserMutation } from "../../app/redux/features/slices/api/usersApiSlice";
+import { useSelector } from "react-redux";
+import CustomizedSnackbar from "./Snackbar";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -19,9 +22,20 @@ const CreateSmtpUserDialog = ({ open, close, domainID }) => {
   const [smtpUsername, setSmtpUsername] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [manageSmtpUser, setManageSmtpUser] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [severity, setSeverity] = useState("");
+  const [smtpData, setSmtpData] = useState(null);
+
+  const { userInfo } = useSelector((state) => state.auth);
+  const { activeCompany } = useSelector((state) => state.user);
 
   const handleClose = () => {
     close();
+  };
+
+  const handleCloseSnackbar = () => {
+    setIsError(false);
   };
 
   const handleNext = () => {
@@ -33,27 +47,32 @@ const CreateSmtpUserDialog = ({ open, close, domainID }) => {
     setManageSmtpUser(false);
   };
 
-  //   const handleCreateSmtpUser = async (e) => {
-  //     e.preventDefault();
-  //     setIsLoading(true);
-  //     try {
-  //       const res = await createSmtpUser({
-  //         name: smtpUsername,
-  //         company_id: activeCompany.id,
-  //         domain_id: domainID,
-  //         token: userInfo.token,
-  //       }).unwrap();
-  //       if (res.message === "Successfully Create account") {
-  //         setIsLoading(false);
-  //         close();
-  //       } else {
-  //         setIsLoading(false);
-  //         close();
-  //       }
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   };
+  const [createSmtpUser] = useCreateSmtpUserMutation();
+
+  const handleCreateSmtpUser = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    try {
+      const res = await createSmtpUser({
+        name: smtpUsername,
+        company_id: activeCompany.id,
+        domain_id: domainID,
+        token: userInfo.token,
+      }).unwrap();
+      if (res.message === "Successfully Create account") {
+        setIsLoading(false);
+        setSmtpData(res.data);
+        handleNext();
+      } else {
+        setIsLoading(false);
+        setIsError(true);
+        setSeverity("error");
+        setErrorMessage("SMTP Username already exists. Please try another.");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <>
       <Dialog
@@ -116,7 +135,7 @@ const CreateSmtpUserDialog = ({ open, close, domainID }) => {
               },
               textTransform: "none",
             }}
-            onClick={handleNext}
+            onClick={handleCreateSmtpUser}
           >
             Create
           </LoadingButton>
@@ -125,8 +144,14 @@ const CreateSmtpUserDialog = ({ open, close, domainID }) => {
       <ManageSmtpUser
         open={manageSmtpUser}
         closeSmtp={handleCloseManageSmtpUser}
-        smtpUsername={smtpUsername}
+        {...smtpData}
         domainID={domainID}
+      />
+      <CustomizedSnackbar
+        open={isError}
+        handleClose={handleCloseSnackbar}
+        severity={severity}
+        message={errorMessage}
       />
     </>
   );

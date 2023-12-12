@@ -8,6 +8,7 @@ import VerifyDomain from "../pages/VerifyDomain";
 import RegisterPage from "../pages/RegisterPage";
 import EmailVerificationStatus from "../pages/EmailVerificationStatus";
 import ManageDomain from "../pages/ManageDomain";
+import EmailActivity from "../pages/EmailActivity";
 
 export const router = createBrowserRouter([
   {
@@ -56,6 +57,16 @@ export const router = createBrowserRouter([
           {
             index: true,
             element: <Domains />,
+          },
+        ],
+      },
+      {
+        path: "emails",
+        element: <MainLayout />,
+        children: [
+          {
+            index: true,
+            element: <EmailActivity />,
           },
         ],
       },

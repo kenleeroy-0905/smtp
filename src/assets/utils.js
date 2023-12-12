@@ -98,6 +98,19 @@ export const domainVerificationText = {
     "Create a TXT record for default._domainkey.thefuturevision.com with this value:",
 };
 
+export const formatDate = (date) => {
+  const options = {
+    year: "numeric",
+    month: "long",
+    day: "2-digit",
+    hour: "numeric",
+    minute: "numeric",
+    second: "numeric",
+    hour12: false,
+  };
+  return new Date(date).toLocaleString("en-US", options);
+};
+
 export const CustomTextField = styled(TextField)({
   "& value.Mui-focused": {
     color: "#00a3b1",
@@ -117,7 +130,9 @@ export const CustomTextField = styled(TextField)({
     },
     "& .MuiInputBase-input": {
       color: "#00a3b1",
-      textAlign: "center",
+      textAlign: "left",
+      innerHeight: "max-content",
+      padding: ".5rem",
     },
   },
 });

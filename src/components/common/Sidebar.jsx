@@ -7,6 +7,7 @@ import SavingsOutlinedIcon from "@mui/icons-material/SavingsOutlined";
 import SportsMotorsportsOutlinedIcon from "@mui/icons-material/SportsMotorsportsOutlined";
 import SwapHorizOutlinedIcon from "@mui/icons-material/SwapHorizOutlined";
 import PublicIcon from "@mui/icons-material/Public";
+import EmailIcon from "@mui/icons-material/Email";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
@@ -25,6 +26,7 @@ import Animate from "./Animate";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { logout } from "../../app/redux/features/slices/auth/authSlice";
+import { setActiveCompany } from "../../app/redux/features/slices/user/userSlice";
 
 const menus = [
   {
@@ -38,6 +40,12 @@ const menus = [
     icon: <PublicIcon />,
     state: "domains",
     path: "/domains",
+  },
+  {
+    title: "Email Activity",
+    icon: <EmailIcon />,
+    state: "email",
+    path: "/emails",
   },
 ];
 
@@ -79,11 +87,12 @@ const investmentMenus = [
 
 const Sidebar = ({ sidebarWidth }) => {
   const navigate = useNavigate();
-  const [activeState, setActiveState] = useState("dashboard");
+  const [activeState, setActiveState] = useState("domains");
   const dispatch = useDispatch();
 
   const logOut = () => {
     dispatch(logout());
+    dispatch(setActiveCompany(null));
     navigate("/");
   };
 
