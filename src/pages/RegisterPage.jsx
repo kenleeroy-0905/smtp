@@ -47,8 +47,6 @@ const RegisterPage = () => {
     setOpen(false);
   };
 
-  const [register] = useRegisterMutation();
-
   const onSubmit = async (e) => {
     e.preventDefault();
     setOpenBackdrop(true);
@@ -62,28 +60,31 @@ const RegisterPage = () => {
       setMessage("Please fill all the fields");
       setSeverity("error");
     } else {
-      const agree_condition = 1;
-      try {
-        const res = await register({
-          company,
-          name,
-          email,
-          password,
-          agree_condition,
-        }).unwrap();
-        setOpenBackdrop(false);
-        setOpen(true);
-        setMessage("Application submitted successfully");
-        setSeverity("success");
-        setTimeout(() => {
-          navigate("/");
-        }, 1000);
-      } catch (err) {
-        setOpenBackdrop(false);
-        setOpen(true);
-        setMessage("Error in submitting registration");
-        setSeverity("error");
-      }
+      const data = {
+        name: name,
+        email: email,
+        password: password,
+        agree_condition: 1,
+        company_name: company,
+      };
+      axios
+        .post("/user/signup.php", data)
+        .then((res) => {
+          setOpenBackdrop(false);
+          setOpen(true);
+          setMessage("Application submitted successfully");
+          setSeverity("success");
+          setTimeout(() => {
+            navigate("/");
+          }, 1000);
+        })
+        .catch((err) => {
+          console.log(err);
+          setOpenBackdrop(false);
+          setOpen(true);
+          setMessage("Error in submitting registration");
+          setSeverity("error");
+        });
     }
   };
 

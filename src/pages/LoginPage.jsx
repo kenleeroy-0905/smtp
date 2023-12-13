@@ -132,7 +132,7 @@ const LoginPage = () => {
           backgroundPosition: "center",
           backgroundSize: "cover",
           backgroundRepeat: "no-repeat",
-          backgroundImage: `url(${images.loginBg})`,
+          backgroundImage: `url(${images.signUpBg})`,
         }}
       />
       {/* background box */}
@@ -162,11 +162,17 @@ const LoginPage = () => {
           }}
         >
           {/* logo */}
-          <Box sx={{ textAlign: "center", p: 5 }}>
+          <Box
+            sx={{
+              textAlign: "center",
+              p: 5,
+              mb: { xs: 5, sm: 5, md: 5, lg: 0, xl: 0 },
+            }}
+          >
             <Animate type="fade" delay={0.5}>
-              <img src={images.logo} alt="logo" height={120}></img>
-              <Typography variant="h3" fontWeight="500">
-                Sign in to your V-Send Account
+              <img src={images.logo} alt="logo" height={"120"}></img>
+              <Typography variant="h5" fontWeight="500">
+                Sign in to your V-Relay Account
               </Typography>
             </Animate>
           </Box>
