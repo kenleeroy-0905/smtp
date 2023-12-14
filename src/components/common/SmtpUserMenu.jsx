@@ -7,7 +7,7 @@ import { PauseCircle, Trash } from "@phosphor-icons/react";
 import { Typography } from "@mui/material";
 import { useSelector } from "react-redux";
 import { useDeleteSmtpUserMutation } from "../../app/redux/features/slices/api/usersApiSlice";
-import CustomizedSnackbar from "./Snackbar";
+import { toast } from "react-toastify";
 import SimpleBackdrop from "./Backdrop";
 
 const StyledMenu = styled((props) => (
@@ -56,15 +56,9 @@ const StyledMenu = styled((props) => (
 const SmtpUserMenu = ({ anchorEl, open, onClose, smtpID, domainID }) => {
   const userInfo = useSelector((state) => state.auth.userInfo);
   const [isLoading, setIsLoading] = useState(false);
-  const [isOpenSnackbar, setIsOpenSnackbar] = useState(false);
-  const [message, setMessage] = useState("");
-  const [severity, setSeverity] = useState("");
 
   const menuClose = () => {
     onClose();
-  };
-  const handleCloseSnackBar = () => {
-    setIsOpenSnackbar(false);
   };
 
   const [deleteSmtpUser] = useDeleteSmtpUserMutation();
@@ -80,16 +74,11 @@ const SmtpUserMenu = ({ anchorEl, open, onClose, smtpID, domainID }) => {
       }).unwrap();
 
       if (res.status === "success") {
-        setMessage(res.message);
-        setSeverity("success");
-        setIsOpenSnackbar(true);
-        setIsLoading(false);
+        toast.info("SMTP user deleted successfully");
         onClose();
       } else {
+        toast.error("Can't delete SMTP user. Please try again");
         setIsLoading(false);
-        setMessage(res.message);
-        setSeverity("error");
-        setIsOpenSnackbar(true);
         onClose();
       }
     } catch (error) {
@@ -132,12 +121,6 @@ const SmtpUserMenu = ({ anchorEl, open, onClose, smtpID, domainID }) => {
           </Typography>
         </MenuItem>
       </StyledMenu>
-      <CustomizedSnackbar
-        open={isOpenSnackbar}
-        handleClose={handleCloseSnackBar}
-        severity={severity}
-        message={message}
-      />
     </>
   );
 };

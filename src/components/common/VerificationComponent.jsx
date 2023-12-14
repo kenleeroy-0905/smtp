@@ -191,6 +191,7 @@ const VerificationComponent = () => {
                 backgroundColor: "#00a3b1",
               },
             }}
+            onClick={() => navigate("/dashboard/profile")}
           >
             Receive Approval
           </Button>

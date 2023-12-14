@@ -2,11 +2,9 @@ import {
   Box,
   Button,
   Checkbox,
-  CircularProgress,
   FormControlLabel,
   Stack,
   Typography,
-  circularProgressClasses,
   colors,
 } from "@mui/material";
 import React, { useState } from "react";
@@ -18,8 +16,7 @@ import { validateEmail } from "../assets/utils";
 import TaskAltIcon from "@mui/icons-material/TaskAlt";
 import SimpleBackdrop from "../components/common/Backdrop";
 import axios from "axios";
-import CustomizedSnackbar from "../components/common/Snackbar";
-import { useRegisterMutation } from "../app/redux/features/slices/api/usersApiSlice";
+import { toast } from "react-toastify";
 
 const RegisterPage = () => {
   const navigate = useNavigate();
@@ -52,13 +49,9 @@ const RegisterPage = () => {
     setOpenBackdrop(true);
     const { company, name, email, password } = formData;
     if (emailError) {
-      setOpen(true);
-      setMessage("Email is invalid");
-      setSeverity("error");
+      toast.error("Please enter a valid email");
     } else if (!name || !company || !email || !password) {
-      setOpen(true);
-      setMessage("Please fill all the fields");
-      setSeverity("error");
+      toast.error("Please fill all the fields");
     } else {
       const data = {
         name: name,
@@ -71,9 +64,7 @@ const RegisterPage = () => {
         .post("/user/signup.php", data)
         .then((res) => {
           setOpenBackdrop(false);
-          setOpen(true);
-          setMessage("Application submitted successfully");
-          setSeverity("success");
+          toast.success("Application submitted successfully");
           setTimeout(() => {
             navigate("/");
           }, 1000);
@@ -81,9 +72,7 @@ const RegisterPage = () => {
         .catch((err) => {
           console.log(err);
           setOpenBackdrop(false);
-          setOpen(true);
-          setMessage("Error in submitting registration");
-          setSeverity("error");
+          toast.error("Something went wrong");
         });
     }
   };
@@ -341,16 +330,6 @@ const RegisterPage = () => {
         </Box>
       </Box>
       {/* Login form */}
-
-      {/* Alert Snackbar */}
-      <CustomizedSnackbar
-        open={open}
-        message={message}
-        severity={severity}
-        handleClose={handleClose}
-      />
-      {/* Alert Snackbar */}
-
       {/* Loading Backdrop */}
       <SimpleBackdrop status={openBackdrop} />
       {/* Loading Backdrop */}

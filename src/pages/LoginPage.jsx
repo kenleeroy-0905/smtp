@@ -31,7 +31,7 @@ import {
 import { setCredentials } from "../app/redux/features/slices/auth/authSlice";
 import { fetchActiveCompany } from "../assets/utils";
 import { setActiveCompany } from "../app/redux/features/slices/user/userSlice";
-import CustomizedSnackbar from "../components/common/Snackbar";
+import { toast } from "react-toastify";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -86,32 +86,29 @@ const LoginPage = () => {
     const { email, password } = formData;
     try {
       const res = await login({ email, password }).unwrap();
-      if (res.status === "Success") {
+      if (res.status === "Error") {
+        toast.error("Incorrect Email or Password");
+        setIsLoading(false);
+      } else {
         if (res.data.email_verify !== "true") {
+          toast.info(res.message);
           setIsLoading(false);
           setToken(res.data.token);
-          setOpen(true);
-          setSeverity("success");
-          setErrorMessage(res.message);
         } else {
           dispatch(setCredentials(res.data));
           dispatch(setActiveCompany(fetchActiveCompany(res.data.company)));
-          setIsError(true);
-          setIsLoading(false);
-          setSeverity("success");
-          setErrorMessage(res.message);
+          // setIsError(true);
+          // setIsLoading(false);
+          // setSeverity("success");
+          // setErrorMessage(res.message);
+          toast.success(res.message);
           setTimeout(() => {
             navigate("/domains");
           }, 1000);
         }
-      } else {
-        setIsError(true);
-        setSeverity("error");
-        setErrorMessage("Incorrect email or password");
-        setIsLoading(false);
       }
     } catch (err) {
-      return console.log(err?.data?.message || err?.error);
+      console.log(err);
     }
   };
 
@@ -314,12 +311,6 @@ const LoginPage = () => {
           </Button>
         </DialogActions>
       </Dialog>
-      <CustomizedSnackbar
-        open={isError}
-        message={errorMessage}
-        severity={severity}
-        handleClose={() => setIsError(false)}
-      />
     </Box>
   );
 };

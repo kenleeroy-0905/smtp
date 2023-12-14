@@ -13,7 +13,7 @@ import SendIcon from "@mui/icons-material/Send";
 import DeleteDialog from "../components/common/DeleteDialog";
 import VerifyDomainInfo from "../components/common/VerifyDomainInfo";
 import { LoadingButton } from "@mui/lab";
-import CustomizedSnackbar from "../components/common/Snackbar";
+import { toast } from "react-toastify";
 import {
   useGetDnsRecordsQuery,
   useVerifyDomainMutation,
@@ -30,16 +30,9 @@ const VerifyDomain = () => {
   const [domain, setDomain] = useState("");
   const [openDelete, setOpenDelete] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isOpenSnackbar, setIsOpenSnackbar] = useState(false);
-  const [message, setMessage] = useState("");
-  const [severity, setSeverity] = useState("");
 
   const handleCloseDelete = () => {
     setOpenDelete(false);
-  };
-
-  const handleCloseSnackbar = () => {
-    setIsOpenSnackbar(false);
   };
 
   const { data } = useGetDnsRecordsQuery({
@@ -59,15 +52,11 @@ const VerifyDomain = () => {
       }).unwrap();
       if (res.message === "Domain Verified") {
         dispatch(setSelectedDomain(null));
-        setMessage(res.message);
-        setSeverity("success");
-        setIsOpenSnackbar(true);
+        toast.success("Domain verified successfully");
         setIsLoading(false);
         navigate("/domains");
       } else {
-        setMessage("Can't verify domain. Please check your DNS records");
-        setSeverity("error");
-        setIsOpenSnackbar(true);
+        toast.error("Can't verify domain. Please verify your DNS records");
         setIsLoading(false);
       }
     } catch (error) {
@@ -236,12 +225,6 @@ const VerifyDomain = () => {
         open={openDelete}
         close={handleCloseDelete}
         title={domain}
-      />
-      <CustomizedSnackbar
-        open={isOpenSnackbar}
-        message={message}
-        severity={severity}
-        handleClose={handleCloseSnackbar}
       />
     </>
   );

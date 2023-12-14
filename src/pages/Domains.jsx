@@ -21,8 +21,6 @@ const Domains = () => {
     token: userInfo.token,
   });
 
-  console.log(data);
-
   return (
     <>
       <Grid

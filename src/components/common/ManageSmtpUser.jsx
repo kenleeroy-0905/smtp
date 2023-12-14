@@ -14,7 +14,7 @@ import SendIcon from "@mui/icons-material/Send";
 import { CustomTextField } from "../../assets/utils";
 import { useEditSmtpUserMutation } from "../../app/redux/features/slices/api/usersApiSlice";
 import { useSelector } from "react-redux";
-import CustomizedSnackbar from "./Snackbar";
+import { toast } from "react-toastify";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="down" ref={ref} {...props} />;
@@ -64,9 +64,6 @@ const ManageSmtpUser = ({
   const userInfo = useSelector((state) => state.auth.userInfo);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [newSmtpUsername, setNewSmtpUsername] = useState("");
-  const [isOpenSnackbar, setIsOpenSnackbar] = useState(false);
-  const [message, setMessage] = useState("");
-  const [severity, setSeverity] = useState("");
 
   useEffect(() => {
     setNewSmtpUsername(name);
@@ -78,10 +75,6 @@ const ManageSmtpUser = ({
 
   const handleCopy = (value) => {
     navigator.clipboard.writeText(value);
-  };
-
-  const handleCloseSnackBar = () => {
-    setIsOpenSnackbar(false);
   };
 
   const [editSmtpUser] = useEditSmtpUserMutation();
@@ -98,15 +91,13 @@ const ManageSmtpUser = ({
         }).unwrap();
         if (res.status === "success") {
           setIsSubmitting(false);
-          setIsOpenSnackbar(true);
-          setMessage("SMTP user successfully updated");
-          setSeverity("success");
+          toast.success("SMTP user successfully updated");
           handleClose();
         } else {
           setIsSubmitting(false);
-          setIsOpenSnackbar(true);
-          setMessage("There's an error updating the SMTP user");
-          setSeverity("error");
+          toast.error(
+            "There's an error updating the SMTP user. Please try again"
+          );
           handleClose();
         }
       } catch (error) {
@@ -334,12 +325,6 @@ const ManageSmtpUser = ({
           </LoadingButton>
         </DialogActions>
       </BootstrapDialog>
-      <CustomizedSnackbar
-        open={isOpenSnackbar}
-        handleClose={handleCloseSnackBar}
-        severity={severity}
-        message={message}
-      />
     </>
   );
 };

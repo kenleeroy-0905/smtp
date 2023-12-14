@@ -16,7 +16,7 @@ const MainLayout = () => {
     if (!userInfo) {
       navigate("/");
     }
-  }, [userInfo]);
+  }, [navigate, userInfo]);
   return (
     <Box display="flex">
       {/* sidebar */}

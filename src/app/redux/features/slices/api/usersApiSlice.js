@@ -4,6 +4,8 @@ const userUrl = "/user";
 const domainUrl = "/domain";
 const smtpUrl = "/smtp";
 const emailUrl = "/mail";
+const selectUrl = "/select";
+const companyUrl = "/company";
 
 export const userApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -90,6 +92,30 @@ export const userApiSlice = apiSlice.injectEndpoints({
       }),
       providesTags: ["Email"],
     }),
+    getTableList: builder.query({
+      query: (data) => ({
+        url: `${selectUrl}/list.php`,
+        method: "POST",
+        body: data,
+      }),
+      providesTags: ["Select"],
+    }),
+    getCompanyDetails: builder.query({
+      query: (data) => ({
+        url: `${companyUrl}/get_company.php`,
+        method: "POST",
+        body: data,
+      }),
+      providesTags: ["Company"],
+    }),
+    editCompanyDetails: builder.mutation({
+      query: (data) => ({
+        url: `${companyUrl}/edit_company.php`,
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
+      invalidatesTags: ["Company"],
+    }),
   }),
 });
 
@@ -105,4 +131,7 @@ export const {
   useEditSmtpUserMutation,
   useDeleteSmtpUserMutation,
   useGetEmailActivityQuery,
+  useGetTableListQuery,
+  useGetCompanyDetailsQuery,
+  useEditCompanyDetailsMutation,
 } = userApiSlice;

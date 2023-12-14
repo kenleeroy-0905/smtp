@@ -9,6 +9,7 @@ import RegisterPage from "../pages/RegisterPage";
 import EmailVerificationStatus from "../pages/EmailVerificationStatus";
 import ManageDomain from "../pages/ManageDomain";
 import EmailActivity from "../pages/EmailActivity";
+import CompanyProfile from "../pages/CompanyProfile";
 
 export const router = createBrowserRouter([
   {
@@ -47,6 +48,11 @@ export const router = createBrowserRouter([
             path: "manage-domain",
             index: true,
             element: <ManageDomain />,
+          },
+          {
+            path: "profile",
+            index: true,
+            element: <CompanyProfile />,
           },
         ],
       },

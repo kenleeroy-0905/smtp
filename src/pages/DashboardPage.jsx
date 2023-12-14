@@ -34,7 +34,7 @@ const DashboardPage = () => {
         direction="row"
         sx={{ mt: 10 }}
       >
-        {isVerified ? <HomeComponent /> : <VerificationComponent />}
+        {!isVerified ? <HomeComponent /> : <VerificationComponent />}
       </Grid>
     </>
   );

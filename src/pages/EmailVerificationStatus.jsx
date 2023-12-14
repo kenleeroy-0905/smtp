@@ -5,7 +5,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import emailVerified from "../assets/images/verified email.png";
 import notVerified from "../assets/images/not-verified.png";
 import SimpleBackdrop from "../components/common/Backdrop";
-import CustomizedSnackbar from "../components/common/Snackbar";
+import { toast } from "react-toastify";
 import Animate from "../components/common/Animate";
 import ConfettiExplosion from "react-confetti-explosion";
 
@@ -34,11 +34,15 @@ const EmailVerificationStatus = () => {
             setIsError(true);
             const message = res.data.message.toUpperCase();
             setErrorMessage(message);
+            toast.error(message);
             return;
           } else {
             setIsVerified(true);
             setIsLoading(false);
             setIsExploding(true);
+            toast.success(
+              "You are already verified. Please Login to continue."
+            );
           }
         })
         .catch((err) => {
@@ -206,20 +210,6 @@ const EmailVerificationStatus = () => {
               )}
             </Box>
           )}
-          <CustomizedSnackbar
-            open={isError}
-            message={
-              errorMessage === "THIS TOKEN IS ALREADY UPDATED"
-                ? "You are already verified. Please Login to continue."
-                : errorMessage
-            }
-            severity={
-              errorMessage === "THIS TOKEN IS ALREADY UPDATED"
-                ? "success"
-                : "error"
-            }
-            handleClose={() => setIsError(false)}
-          />
         </Box>
       )}
     </Animate>

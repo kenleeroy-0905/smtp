@@ -8,7 +8,7 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import { useDispatch, useSelector } from "react-redux";
 import { setSelectedDomain } from "../../app/redux/features/slices/domain/domainSlice";
-import CustomizedSnackbar from "./Snackbar";
+import { toast } from "react-toastify";
 import { LoadingButton } from "@mui/lab";
 import SendIcon from "@mui/icons-material/Send";
 import { useNavigate } from "react-router-dom";
@@ -21,16 +21,9 @@ const DomainInput = ({ open, close, next, title, type }) => {
   const { activeCompany } = useSelector((state) => state.user);
   const [validDomain, setValidDomain] = React.useState(false);
   const [domain, setDomain] = React.useState("");
-  const [isError, setIsError] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
-  const [message, setMessage] = React.useState("");
-  const [severity, setSeverity] = React.useState("");
   const handleClose = () => {
     close();
-  };
-
-  const handleCloseSnackbar = () => {
-    setIsError(false);
   };
 
   const handleDomainInput = (e) => {
@@ -38,12 +31,9 @@ const DomainInput = ({ open, close, next, title, type }) => {
     const domainRegex = /^([\da-z.-]+)\.([a-z.]{1,6})([\/\w .-]*)*\/?$/;
     if (domainRegex.test(domain)) {
       setValidDomain(true);
-      setIsError(false);
     } else {
       setValidDomain(false);
-      setIsError(true);
-      setMessage("Please enter a valid domain");
-      setSeverity("warning");
+      toast.error("Please enter a valid domain name");
     }
   };
 
@@ -60,9 +50,7 @@ const DomainInput = ({ open, close, next, title, type }) => {
       }).unwrap();
       if (res.message === "Successfully add domain") {
         setIsLoading(false);
-        setMessage("Domain added successfully!");
-        setSeverity("success");
-        setIsError(true);
+        toast.success("Domain added successfully");
         if (next) {
           dispatch(setSelectedDomain(res.data));
           next();
@@ -73,9 +61,7 @@ const DomainInput = ({ open, close, next, title, type }) => {
         close();
       } else {
         setIsLoading(false);
-        setMessage("Something went wrong! Please try again later.");
-        setSeverity("error");
-        setIsError(true);
+        toast.error("Error adding domain. Please try again");
       }
     } catch (error) {
       console.log(error);
@@ -134,12 +120,6 @@ const DomainInput = ({ open, close, next, title, type }) => {
           </LoadingButton>
         </DialogActions>
       </Dialog>
-      <CustomizedSnackbar
-        open={isError}
-        message={message}
-        severity={severity}
-        handleClose={handleCloseSnackbar}
-      />
     </>
   );
 };

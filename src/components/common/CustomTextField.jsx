@@ -15,6 +15,7 @@ const CustomTextField = styled(TextField)({
   "& .MuiOutlinedInput-root": {
     "& fieldset": {
       borderColor: "#00a3b1",
+      width: "100%",
     },
     "&:hover fieldset": {
       borderColor: "#00a3b1",
@@ -38,6 +39,7 @@ const CustomTextFieldComponent = ({
   type,
   showPassword,
   setShowPassword,
+  multiline,
 }) => {
   const changeShowPassword = () => {
     setShowPassword();
@@ -53,6 +55,7 @@ const CustomTextFieldComponent = ({
       onChange={handler}
       helperText={helper}
       error={error}
+      multiline={multiline}
       type={showPassword ? "text" : type}
       InputProps={{
         endAdornment:

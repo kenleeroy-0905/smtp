@@ -24,7 +24,7 @@ import {
 import { images } from "../../assets";
 import Animate from "./Animate";
 import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../app/redux/features/slices/auth/authSlice";
 import { setActiveCompany } from "../../app/redux/features/slices/user/userSlice";
 
@@ -86,6 +86,8 @@ const investmentMenus = [
 ];
 
 const Sidebar = ({ sidebarWidth }) => {
+  const isGlobalLoading = useSelector((state) => state.global.isGlobalLoading);
+
   const navigate = useNavigate();
   const [activeState, setActiveState] = useState("domains");
   const dispatch = useDispatch();
@@ -105,6 +107,7 @@ const Sidebar = ({ sidebarWidth }) => {
         sx={{ py: 0.5 }}
       >
         <ListItemButton
+          disabled={isGlobalLoading ? true : false}
           sx={{
             borderRadius: "10px",
             bgcolor: props.isActive ? "#154b69" : "",
