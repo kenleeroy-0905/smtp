@@ -43,9 +43,6 @@ const LoginPage = () => {
   const [token, setToken] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [isError, setIsError] = useState(false);
-  const [severity, setSeverity] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
 
   const { userInfo } = useSelector((state) => state.auth);
 
@@ -63,9 +60,7 @@ const LoginPage = () => {
   const resendVerificationEmail = async () => {
     try {
       const res = await resendEmailVerification({ token }).unwrap();
-      setIsError(true);
-      setSeverity("success");
-      setErrorMessage("Verification email sent successfully");
+      toast.success("Verification email sent successfully");
       setTimeout(() => {
         setOpen(false);
       }, 1000);
@@ -93,17 +88,14 @@ const LoginPage = () => {
         if (res.data.email_verify !== "true") {
           toast.info(res.message);
           setIsLoading(false);
+          setOpen(true);
           setToken(res.data.token);
         } else {
           dispatch(setCredentials(res.data));
           dispatch(setActiveCompany(fetchActiveCompany(res.data.company)));
-          // setIsError(true);
-          // setIsLoading(false);
-          // setSeverity("success");
-          // setErrorMessage(res.message);
           toast.success(res.message);
           setTimeout(() => {
-            navigate("/domains");
+            navigate("/dashboard");
           }, 1000);
         }
       }

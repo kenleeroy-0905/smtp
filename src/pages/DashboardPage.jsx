@@ -7,6 +7,7 @@ import { useDomainListQuery } from "../app/redux/features/slices/api/usersApiSli
 
 const DashboardPage = () => {
   const [isVerified, setIsVerified] = useState(false);
+  const [hasCompany, setHasCompany] = useState(false);
   const { activeCompany } = useSelector((state) => state.user);
   const { userInfo } = useSelector((state) => state.auth);
 
@@ -20,8 +21,12 @@ const DashboardPage = () => {
       data?.data?.filter((domain) => {
         return domain.status === "active";
       }).length > 0
-        ? setIsVerified(true)
+        ? setHasCompany(true)
         : setIsVerified(false);
+    }
+
+    if (setHasCompany && activeCompany.active === true) {
+      setIsVerified(true);
     }
   }, [data, activeCompany]);
 

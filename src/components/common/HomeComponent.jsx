@@ -1,6 +1,20 @@
-import { Box, Button, Grid, Stack, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Grid,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
+  Stack,
+  Typography,
+} from "@mui/material";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import React, { useState } from "react";
 import MarkEmailReadIcon from "@mui/icons-material/MarkEmailRead";
+import { viewOptions } from "../../assets/utils";
 
 const HomeComponent = () => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -94,7 +108,7 @@ const HomeComponent = () => {
           </Stack>
         </Stack>
       </Grid>
-      {/* <Grid
+      <Grid
         item
         sm={12}
         xs={12}
@@ -106,7 +120,7 @@ const HomeComponent = () => {
       >
         <Stack spacing={2}>
           <Stack
-            direction={"row"}
+            direction={{ xs: "column", sm: "column", md: "row" }}
             justifyContent={"space-between"}
             alignItems={"center"}
           >
@@ -157,9 +171,8 @@ const HomeComponent = () => {
               ))}
             </Menu>
           </Stack>
-          <StatBox title={"Emails"} />
         </Stack>
-      </Grid> */}
+      </Grid>
     </>
   );
 };

@@ -13,10 +13,12 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import ExpandCircleDownIcon from "@mui/icons-material/ExpandCircleDown";
 import AccountsDialog from "./AccountsDialog";
 import { useSelector } from "react-redux";
+import { useGetCompanyDetailsQuery } from "../../app/redux/features/slices/api/usersApiSlice";
 
 const Header = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [openAccountsDialog, setOpenAccountsDialog] = useState(false);
+
   const open = Boolean(anchorEl);
 
   const { userInfo } = useSelector((state) => state.auth);
@@ -41,6 +43,15 @@ const Header = () => {
     setAnchorEl(event.currentTarget);
   };
 
+  const { data, isError } = useGetCompanyDetailsQuery({
+    token: userInfo?.token,
+    id: activeCompany?.id,
+  });
+
+  {
+    isError && setOpenAccountsDialog(true);
+  }
+
   return (
     <>
       <Grid container alignItems="center" direction="row" sx={{ mt: 2 }}>
@@ -58,7 +69,7 @@ const Header = () => {
               <img src={logo} alt="logo" style={{ width: 40, height: 40 }} />
               <Stack alignItems="flex-start">
                 <Typography variant="h6" sx={{ fontWeight: "500" }}>
-                  {activeCompany?.name}
+                  {data?.data?.name}
                 </Typography>
                 <Typography variant="subtitle2" sx={{ fontWeight: "400" }}>
                   Subscription: Basic
