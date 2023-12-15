@@ -50,7 +50,7 @@ const LoginPage = () => {
     if (userInfo) {
       setIsLoading(true);
       setTimeout(() => {
-        navigate("/domains");
+        navigate("/dashboard");
       }, 1000);
     }
   }, [userInfo, navigate]);

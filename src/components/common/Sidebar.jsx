@@ -89,7 +89,7 @@ const Sidebar = ({ sidebarWidth }) => {
   const isGlobalLoading = useSelector((state) => state.global.isGlobalLoading);
 
   const navigate = useNavigate();
-  const [activeState, setActiveState] = useState("domains");
+  const [activeState, setActiveState] = useState("dashboard");
   const dispatch = useDispatch();
 
   const logOut = () => {
