@@ -23,10 +23,11 @@ import {
 } from "@mui/material";
 import { images } from "../../assets";
 import Animate from "./Animate";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../app/redux/features/slices/auth/authSlice";
 import { setActiveCompany } from "../../app/redux/features/slices/user/userSlice";
+import { setActivePath } from "../../app/redux/features/slices/global/globalSlice";
 
 const menus = [
   {
@@ -87,10 +88,15 @@ const investmentMenus = [
 
 const Sidebar = ({ sidebarWidth }) => {
   const isGlobalLoading = useSelector((state) => state.global.isGlobalLoading);
+  const activePath = useSelector((state) => state.global.activePath);
 
   const navigate = useNavigate();
-  const [activeState, setActiveState] = useState("dashboard");
+  const [activeState, setActiveState] = useState(activePath);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    setActiveState(activePath);
+  }, [activePath]);
 
   const logOut = () => {
     dispatch(logout());
@@ -110,11 +116,12 @@ const Sidebar = ({ sidebarWidth }) => {
           disabled={isGlobalLoading ? true : false}
           sx={{
             borderRadius: "10px",
-            bgcolor: props.isActive ? "#154b69" : "",
-            color: props.isActive ? colors.common.white : "",
+            bgcolor: activeState === props.item.state ? "#154b69" : "",
+            color: activeState === props.item.state ? colors.common.white : "",
             "&:hover": {
-              bgcolor: props.isActive ? "#5cc4cd" : "",
-              color: props.isActive ? colors.common.white : "",
+              bgcolor: activeState === props.item.state ? "#5cc4cd" : "",
+              color:
+                activeState === props.item.state ? colors.common.white : "",
             },
           }}
           onClick={
@@ -122,6 +129,7 @@ const Sidebar = ({ sidebarWidth }) => {
               ? logOut
               : () => {
                   setActiveState(props.item.state);
+                  dispatch(setActivePath(props.item.state));
                   navigate(props.item.path);
                 }
           }
@@ -129,7 +137,8 @@ const Sidebar = ({ sidebarWidth }) => {
           <ListItemIcon
             sx={{
               minWidth: "40px",
-              color: props.isActive ? colors.common.white : "",
+              color:
+                activeState === props.item.state ? colors.common.white : "",
             }}
           >
             {props.item.icon}

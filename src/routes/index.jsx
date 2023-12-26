@@ -10,12 +10,21 @@ import EmailVerificationStatus from "../pages/EmailVerificationStatus";
 import ManageDomain from "../pages/ManageDomain";
 import EmailActivity from "../pages/EmailActivity";
 import CompanyProfile from "../pages/CompanyProfile";
+import ErrorHandler from "../errorHandler/ErrorHandler";
+import HomePage from "../pages/HomePage";
+import PricingPage from "../pages/PricingPage";
 
 export const router = createBrowserRouter([
   {
     path: "/",
     element: <AppLayout />,
+    errorElement: <ErrorHandler />,
     children: [
+      // {
+      //   path: "/",
+      //   index: true,
+      //   element: <HomePage />,
+      // },
       {
         path: "/",
         index: true,
@@ -34,6 +43,7 @@ export const router = createBrowserRouter([
       {
         path: "dashboard",
         element: <MainLayout />,
+        errorElement: <ErrorHandler />,
         children: [
           {
             index: true,
@@ -73,6 +83,16 @@ export const router = createBrowserRouter([
           {
             index: true,
             element: <EmailActivity />,
+          },
+        ],
+      },
+      {
+        path: "pricing",
+        element: <MainLayout />,
+        children: [
+          {
+            index: true,
+            element: <PricingPage />,
           },
         ],
       },

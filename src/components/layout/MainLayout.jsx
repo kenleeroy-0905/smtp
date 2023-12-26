@@ -1,22 +1,24 @@
 import { Box } from "@mui/material";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Sidebar from "../common/Sidebar";
 import { Outlet, useNavigate } from "react-router-dom";
 import Header from "../common/Header";
 import FooterMenu from "../common/FooterMenu";
 import { useSelector } from "react-redux";
+import Animate from "../common/Animate";
 
 const sidebarWidth = 350;
 
 const MainLayout = () => {
-  const { userInfo } = useSelector((state) => state.auth);
   const navigate = useNavigate();
+  const isAuthorized = useSelector((state) => state.auth.isAuthorized);
 
   useEffect(() => {
-    if (!userInfo) {
+    if (!isAuthorized) {
       navigate("/");
     }
-  }, [navigate, userInfo]);
+  }, [isAuthorized, navigate]);
+
   return (
     <Box display="flex">
       {/* sidebar */}
@@ -33,7 +35,9 @@ const MainLayout = () => {
         }}
       >
         <Header />
-        <Outlet />
+        <Animate type="fade" delay={1}>
+          <Outlet />
+        </Animate>
         <FooterMenu />
       </Box>
     </Box>

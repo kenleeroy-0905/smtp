@@ -15,14 +15,12 @@ root.render(
       <React.StrictMode>
         <ToastContainer
           position="bottom-right"
-          autoClose={3000}
+          autoClose={2000}
           hideProgressBar={false}
           newestOnTop={false}
           closeOnClick
           rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
+          pauseOnHover={true}
           theme="dark"
           toastStyle={{ background: "#154b69" }}
         />

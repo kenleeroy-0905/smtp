@@ -9,4 +9,6 @@ export const images = {
   userProfile: require("./images/7309681.jpg"),
   bookingImage: require("./images/cherry-blossoms-fuji-mountain-spring-sunrise-shizuoka-japan.jpg"),
   logo: require("./images/logo.png"),
+  errorImg: require("./images/error.png"),
+  emailIcon: require("./images/email-icon.png"),
 };

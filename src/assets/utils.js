@@ -111,31 +111,31 @@ export const formatDate = (date) => {
   return new Date(date).toLocaleString("en-US", options);
 };
 
-export const CustomTextField = styled(TextField)({
+export const CustomTextField = styled(TextField)(({ theme, iserror }) => ({
   "& value.Mui-focused": {
-    color: "#00a3b1",
+    color: !iserror ? "#00a3b1" : "#ff5050",
   },
   "& .MuiInput-underline:after": {
-    borderBottomColor: "#00a3b1",
+    borderBottomColor: !iserror ? "#00a3b1" : "#ff5050",
   },
   "& .MuiOutlinedInput-root": {
     "& fieldset": {
-      borderColor: "#00a3b1",
+      borderColor: !iserror ? "#00a3b1" : "#ff5050",
     },
     "&:hover fieldset": {
-      borderColor: "#00a3b1",
+      borderColor: !iserror ? "#00a3b1" : "#ff5050",
     },
     "&.Mui-focused fieldset": {
-      borderColor: "#00a3b1",
+      borderColor: !iserror ? "#00a3b1" : "#ff5050",
     },
     "& .MuiInputBase-input": {
-      color: "#00a3b1",
+      color: !iserror ? "#00a3b1" : "#ff5050",
       textAlign: "left",
       innerHeight: "max-content",
       padding: ".5rem",
     },
   },
-});
+}));
 
 export const customToolbar = () => {
   return (
@@ -152,22 +152,22 @@ export const headerMenus = [
   {
     id: 1,
     title: " Add Domain",
-    icon: <AddIcon />,
+    icon: <AddIcon sx={{ color: "#164c68" }} />,
   },
   {
     id: 2,
     title: " My Profile",
-    icon: <AccountCircleIcon />,
+    icon: <AccountCircleIcon sx={{ color: "#164c68" }} />,
   },
   {
     id: 3,
     title: " Settings",
-    icon: <ManageAccountsIcon />,
+    icon: <ManageAccountsIcon sx={{ color: "#164c68" }} />,
   },
   {
-    id: 1,
+    id: 4,
     title: " Logout",
-    icon: <ExitToAppIcon />,
+    icon: <ExitToAppIcon sx={{ color: "#164c68" }} />,
   },
 ];
 

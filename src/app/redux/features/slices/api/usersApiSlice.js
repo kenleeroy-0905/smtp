@@ -6,6 +6,7 @@ const smtpUrl = "/smtp";
 const emailUrl = "/mail";
 const selectUrl = "/select";
 const companyUrl = "/company";
+const packageUrl = "/package";
 
 export const userApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -36,10 +37,19 @@ export const userApiSlice = apiSlice.injectEndpoints({
         method: "POST",
         body: data,
       }),
+      invalidatesTags: ["Domain"],
     }),
     getDnsRecords: builder.query({
       query: (data) => ({
         url: `${domainUrl}/domain.php`,
+        method: "POST",
+        body: data,
+      }),
+      providesTags: ["Domain"],
+    }),
+    domainList: builder.query({
+      query: (data) => ({
+        url: `${domainUrl}/domain_list.php`,
         method: "POST",
         body: data,
       }),
@@ -51,14 +61,15 @@ export const userApiSlice = apiSlice.injectEndpoints({
         method: "POST",
         body: data,
       }),
+      invalidatesTags: ["Domain"],
     }),
-    domainList: builder.query({
+    deleteDomain: builder.mutation({
       query: (data) => ({
-        url: `${domainUrl}/domain_list.php`,
+        url: `${domainUrl}/delete_domain.php`,
         method: "POST",
         body: data,
       }),
-      providesTags: ["Domain"],
+      invalidatesTags: ["Domain"],
     }),
     createSmtpUser: builder.mutation({
       query: (data) => ({
@@ -116,6 +127,13 @@ export const userApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["Company"],
     }),
+    getPackageList: builder.query({
+      query: (data) => ({
+        url: `${packageUrl}/list.php`,
+        method: "POST",
+        body: data,
+      }),
+    }),
   }),
 });
 
@@ -127,6 +145,7 @@ export const {
   useGetDnsRecordsQuery,
   useVerifyDomainMutation,
   useDomainListQuery,
+  useDeleteDomainMutation,
   useCreateSmtpUserMutation,
   useEditSmtpUserMutation,
   useDeleteSmtpUserMutation,
@@ -134,4 +153,5 @@ export const {
   useGetTableListQuery,
   useGetCompanyDetailsQuery,
   useEditCompanyDetailsMutation,
+  useGetPackageListQuery,
 } = userApiSlice;

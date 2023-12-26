@@ -8,20 +8,27 @@ import logo from "../../assets/images/logo.png";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { setSelectedDomain } from "../../app/redux/features/slices/domain/domainSlice";
-import { useDomainListQuery } from "../../app/redux/features/slices/api/usersApiSlice";
+import DeleteDialog from "./DeleteDialog";
+import { setActivePath } from "../../app/redux/features/slices/global/globalSlice";
 
 const DomainsTable = ({ domain }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const [rows, setRows] = useState([]);
+  const [domainId, setDomainId] = useState(null);
+  const [domainName, setDomainName] = useState("");
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+
+  const handleCloseDeleteDialog = () => {
+    setOpenDeleteDialog(false);
+  };
 
   useEffect(() => {
     if (domain) {
       const newRows = domain.map((row, index) => ({ id: index, ...row }));
       setRows(newRows);
     }
-    console.log(rows);
   }, [domain]);
 
   const columns = [
@@ -170,7 +177,14 @@ const DomainsTable = ({ domain }) => {
       headerName: "",
       align: "right",
       renderCell: (params) => (
-        <div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: ".5rem",
+          }}
+        >
           {params?.row.status === "active" ? (
             <Button
               variant="contained"
@@ -182,6 +196,7 @@ const DomainsTable = ({ domain }) => {
               }}
               onClick={() => {
                 dispatch(setSelectedDomain(params?.row));
+                dispatch(setActivePath("dashboard"));
                 navigate("/dashboard/manage-domain");
               }}
             >
@@ -198,12 +213,29 @@ const DomainsTable = ({ domain }) => {
               }}
               onClick={() => {
                 dispatch(setSelectedDomain(params?.row));
+                dispatch(setActivePath("dashboard"));
                 navigate("/dashboard/verify-domain");
               }}
             >
               Verify
             </Button>
           )}
+          <Button
+            variant="contained"
+            sx={{
+              backgroundColor: "red",
+              "&:hover": {
+                backgroundColor: "darkred",
+              },
+            }}
+            onClick={() => {
+              setOpenDeleteDialog(true);
+              setDomainId(params?.row.id);
+              setDomainName(params?.row.domain_name);
+            }}
+          >
+            Delete
+          </Button>
         </div>
       ),
     },
@@ -229,6 +261,13 @@ const DomainsTable = ({ domain }) => {
           }}
         />
       </Box>
+      <DeleteDialog
+        open={openDeleteDialog}
+        close={handleCloseDeleteDialog}
+        title={domainName}
+        type={"domain"}
+        domain={domainId}
+      />
     </>
   );
 };

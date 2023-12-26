@@ -23,8 +23,6 @@ const RegisterPage = () => {
 
   const [openBackdrop, setOpenBackdrop] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [message, setMessage] = useState("");
-  const [severity, setSeverity] = useState("");
   const [lowerValid, setLowerValid] = useState(false);
   const [upperValid, setUpperValid] = useState(false);
   const [numberValid, setNumberValid] = useState(false);
@@ -63,6 +61,7 @@ const RegisterPage = () => {
       axios
         .post("/user/signup.php", data)
         .then((res) => {
+          console.log(res);
           setOpenBackdrop(false);
           toast.success("Application submitted successfully");
           setTimeout(() => {

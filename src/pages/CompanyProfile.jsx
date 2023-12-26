@@ -4,7 +4,10 @@ import { useDispatch, useSelector } from "react-redux";
 import CustomTextFieldComponent from "../components/common/CustomTextField";
 import CompanyProfileSelectComponent from "../components/common/CompanyProfileSelectComponent";
 import SimpleBackdrop from "../components/common/Backdrop";
-import { setIsGlobalLoading } from "../app/redux/features/slices/global/globalSlice";
+import {
+  setActivePath,
+  setIsGlobalLoading,
+} from "../app/redux/features/slices/global/globalSlice";
 import {
   useEditCompanyDetailsMutation,
   useGetCompanyDetailsQuery,
@@ -77,6 +80,7 @@ const CompanyProfile = () => {
         dispatch(setIsGlobalLoading(false));
         setIsSubmitting(false);
         toast.success("Company details updated successfully");
+        dispatch(setActivePath("dashboard"));
         navigate("/dashboard");
       } else {
         dispatch(setIsGlobalLoading(false));

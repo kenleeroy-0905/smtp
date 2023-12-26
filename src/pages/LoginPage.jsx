@@ -28,10 +28,14 @@ import {
   useLoginMutation,
   useResendEmailVerificationMutation,
 } from "../app/redux/features/slices/api/usersApiSlice";
-import { setCredentials } from "../app/redux/features/slices/auth/authSlice";
+import {
+  setCredentials,
+  setIsAuthorized,
+} from "../app/redux/features/slices/auth/authSlice";
 import { fetchActiveCompany } from "../assets/utils";
 import { setActiveCompany } from "../app/redux/features/slices/user/userSlice";
 import { toast } from "react-toastify";
+import { setActivePath } from "../app/redux/features/slices/global/globalSlice";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -50,6 +54,7 @@ const LoginPage = () => {
     if (userInfo) {
       setIsLoading(true);
       setTimeout(() => {
+        dispatch(setActivePath("dashboard"));
         navigate("/dashboard");
       }, 1000);
     }
@@ -86,15 +91,17 @@ const LoginPage = () => {
         setIsLoading(false);
       } else {
         if (res.data.email_verify !== "true") {
-          toast.info(res.message);
+          toast.warning("Your email is not verified!");
           setIsLoading(false);
           setOpen(true);
           setToken(res.data.token);
         } else {
+          dispatch(setIsAuthorized(true));
           dispatch(setCredentials(res.data));
           dispatch(setActiveCompany(fetchActiveCompany(res.data.company)));
           toast.success(res.message);
           setTimeout(() => {
+            dispatch(setActivePath("dashboard"));
             navigate("/dashboard");
           }, 1000);
         }

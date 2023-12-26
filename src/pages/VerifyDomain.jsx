@@ -1,4 +1,11 @@
-import { Grid, Button, Typography, Stack, Divider } from "@mui/material";
+import {
+  Grid,
+  Button,
+  Typography,
+  Stack,
+  Divider,
+  CircularProgress,
+} from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -19,6 +26,7 @@ import {
   useVerifyDomainMutation,
 } from "../app/redux/features/slices/api/usersApiSlice";
 import { setSelectedDomain } from "../app/redux/features/slices/domain/domainSlice";
+import { setActivePath } from "../app/redux/features/slices/global/globalSlice";
 
 const VerifyDomain = () => {
   const navigate = useNavigate();
@@ -27,21 +35,23 @@ const VerifyDomain = () => {
   const { activeCompany } = useSelector((state) => state.user);
   const { selectedDomain } = useSelector((state) => state.domain);
 
-  const [domain, setDomain] = useState("");
   const [openDelete, setOpenDelete] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [sfpError, setSfpError] = useState(null);
+  const [dkimError, setDkimError] = useState(null);
 
   const handleCloseDelete = () => {
     setOpenDelete(false);
   };
 
-  const { data } = useGetDnsRecordsQuery({
+  const { data, isFetching } = useGetDnsRecordsQuery({
     domain_id: selectedDomain.id,
     company_id: activeCompany.id,
     token: userInfo.token,
   });
 
   const [verifyDomain] = useVerifyDomainMutation();
+
   const handleVerifyDomain = async () => {
     setIsLoading(true);
     try {
@@ -51,16 +61,30 @@ const VerifyDomain = () => {
         token: userInfo.token,
       }).unwrap();
       if (res.message === "Domain Verified") {
-        dispatch(setSelectedDomain(null));
-        toast.success("Domain verified successfully");
         setIsLoading(false);
+        dispatch(setActivePath("domains"));
         navigate("/domains");
+        toast.success("Domain verified successfully");
       } else {
+        if (res.spf === false && res.dkim === true) {
+          setSfpError(true);
+          setDkimError(false);
+        } else if (res.spf === true && res.dkim === false) {
+          setSfpError(false);
+          setDkimError(true);
+        } else {
+          setSfpError(true);
+          setDkimError(true);
+        }
         toast.error("Can't verify domain. Please verify your DNS records");
         setIsLoading(false);
       }
     } catch (error) {
       console.log(error);
+      toast.error(
+        "Caught! Can't verify domain. Please verify your DNS records"
+      );
+      setIsLoading(false);
     }
   };
 
@@ -93,17 +117,15 @@ const VerifyDomain = () => {
         alignItems="center"
         direction="row"
         sx={{ mt: 8 }}
+        height={"100%"}
       >
         <Grid
-          container
           item
           md={8}
           sm={12}
-          sx={{ backgroundColor: "#f3f4f6", p: 4 }}
-          justifyContent="space-between"
-          height="800px"
+          sx={{ backgroundColor: "#f3f4f6", p: 4, height: "800px" }}
         >
-          <Stack spacing={4}>
+          <Stack spacing={4} justifyContent={"space-around"} height="100%">
             <Stack spacing={2} direction="row" alignItems="center">
               <LooksOneIcon sx={{ fontSize: 60, color: "#00a3b1" }} />
               <VerifyDomainTxt
@@ -117,6 +139,8 @@ const VerifyDomain = () => {
                 mainTxt={"SPF Record"}
                 secondaryTxt={domainVerificationText.spfText}
                 textField={data?.data?.spf}
+                type={"record"}
+                error={sfpError}
               />
             </Stack>
             <Stack spacing={2} direction="row" alignItems="center">
@@ -125,6 +149,8 @@ const VerifyDomain = () => {
                 mainTxt={"DKIM Record"}
                 secondaryTxt={`Create a TXT record for default._domainkey.${data?.data?.domain_name} with the value below:`}
                 textField={"v=DKIM1;t=s;p=" + data?.data?.dkim}
+                type={"record"}
+                error={dkimError}
               />
             </Stack>
             <Divider variant="middle" />
@@ -144,6 +170,7 @@ const VerifyDomain = () => {
                   color: "#fff",
                   "&:hover": {
                     backgroundColor: "#00a3b1",
+                    borderColor: "#00a3b1",
                   },
                 }}
                 onClick={() => handleVerifyDomain()}
@@ -169,10 +196,11 @@ const VerifyDomain = () => {
           item
           md={4}
           sm={12}
-          sx={{ backgroundColor: "#e5f6f7", p: 4 }}
+          sx={{ backgroundColor: "#e5f6f7" }}
+          p={5}
           height="800px"
         >
-          <Stack spacing={10}>
+          <Stack spacing={9}>
             <VerifyDomainInfo
               question={"How long does it take to verify the domain?"}
               answer={"Your part: 5 minutes"}
@@ -224,7 +252,9 @@ const VerifyDomain = () => {
       <DeleteDialog
         open={openDelete}
         close={handleCloseDelete}
-        title={domain}
+        title={data?.data?.domain_name}
+        type={"domain"}
+        domain={selectedDomain.id}
       />
     </>
   );

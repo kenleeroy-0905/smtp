@@ -75,6 +75,7 @@ const SmtpUserMenu = ({ anchorEl, open, onClose, smtpID, domainID }) => {
 
       if (res.status === "success") {
         toast.info("SMTP user deleted successfully");
+        setIsLoading(false);
         onClose();
       } else {
         toast.error("Can't delete SMTP user. Please try again");

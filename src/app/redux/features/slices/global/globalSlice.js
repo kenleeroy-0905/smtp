@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   isGlobalLoading: false,
+  activePath: "",
 };
 
 export const globalSlice = createSlice({
@@ -11,9 +12,12 @@ export const globalSlice = createSlice({
     setIsGlobalLoading: (state, action) => {
       state.isGlobalLoading = action.payload;
     },
+    setActivePath: (state, action) => {
+      state.activePath = action.payload;
+    },
   },
 });
 
-export const { setIsGlobalLoading } = globalSlice.actions;
+export const { setIsGlobalLoading, setActivePath } = globalSlice.actions;
 
 export default globalSlice.reducer;

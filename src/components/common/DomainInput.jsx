@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Dialog from "@mui/material/Dialog";
@@ -6,6 +6,7 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
+import CircularProgress from "@mui/material/CircularProgress";
 import { useDispatch, useSelector } from "react-redux";
 import { setSelectedDomain } from "../../app/redux/features/slices/domain/domainSlice";
 import { toast } from "react-toastify";
@@ -13,17 +14,26 @@ import { LoadingButton } from "@mui/lab";
 import SendIcon from "@mui/icons-material/Send";
 import { useNavigate } from "react-router-dom";
 import { useAddDomainMutation } from "../../app/redux/features/slices/api/usersApiSlice";
+import CustomizedSnackbar from "./Snackbar";
+import { setActivePath } from "../../app/redux/features/slices/global/globalSlice";
 
 const DomainInput = ({ open, close, next, title, type }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { userInfo } = useSelector((state) => state.auth);
   const { activeCompany } = useSelector((state) => state.user);
-  const [validDomain, setValidDomain] = React.useState(false);
-  const [domain, setDomain] = React.useState("");
-  const [isLoading, setIsLoading] = React.useState(false);
+  const [validDomain, setValidDomain] = useState(false);
+  const [domain, setDomain] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [message, setMessage] = useState("");
+  const [severity, setSeverity] = useState("");
   const handleClose = () => {
     close();
+  };
+
+  const handleCloseSnackbar = () => {
+    setIsError(false);
   };
 
   const handleDomainInput = (e) => {
@@ -31,9 +41,12 @@ const DomainInput = ({ open, close, next, title, type }) => {
     const domainRegex = /^([\da-z.-]+)\.([a-z.]{1,6})([\/\w .-]*)*\/?$/;
     if (domainRegex.test(domain)) {
       setValidDomain(true);
+      setIsError(false);
     } else {
       setValidDomain(false);
-      toast.error("Please enter a valid domain name");
+      setIsError(true);
+      setMessage("Please enter a valid domain");
+      setSeverity("warning");
     }
   };
 
@@ -56,6 +69,7 @@ const DomainInput = ({ open, close, next, title, type }) => {
           next();
         } else {
           dispatch(setSelectedDomain(res.data));
+          dispatch(setActivePath("dashboard"));
           navigate("/dashboard/verify-domain");
         }
         close();
@@ -115,11 +129,18 @@ const DomainInput = ({ open, close, next, title, type }) => {
             }}
             onClick={handleNext}
             disabled={validDomain ? false : true}
+            loadingIndicator={<CircularProgress size={20} />}
           >
             Add
           </LoadingButton>
         </DialogActions>
       </Dialog>
+      <CustomizedSnackbar
+        open={isError}
+        message={message}
+        severity={severity}
+        handleClose={handleCloseSnackbar}
+      />
     </>
   );
 };

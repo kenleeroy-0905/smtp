@@ -14,10 +14,12 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import Terms from "./Terms";
 import DomainInput from "./DomainInput";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { setActivePath } from "../../app/redux/features/slices/global/globalSlice";
 
 const VerificationComponent = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [activeStep, setActiveStep] = useState(0);
   const [openTerms, setOpenTerms] = useState(false);
   const [openDomainInput, setOpenDomainInput] = useState(false);
@@ -141,13 +143,7 @@ const VerificationComponent = () => {
           <Step>
             <StepContent>
               <Stack direction="row" alignItems="center" spacing={1}>
-                <Typography variant="h5">Verify your domain:</Typography>
-                <Typography
-                  variant="h5"
-                  sx={{ fontWeight: 500, textDecoration: "underline" }}
-                >
-                  {selectedDomain?.domain}
-                </Typography>
+                <Typography variant="h5">Verify your domain</Typography>
               </Stack>
 
               <Typography variant="subtitle1">
@@ -156,7 +152,10 @@ const VerificationComponent = () => {
               <Box sx={{ mt: 2 }}>
                 <Button
                   variant="contained"
-                  onClick={() => navigate("/dashboard/verify-domain")}
+                  onClick={() => {
+                    dispatch(setActivePath("dashboard"));
+                    navigate("/dashboard/verify-domain");
+                  }}
                   sx={{
                     mr: 2,
                     bgcolor: "#154b69",
@@ -191,7 +190,10 @@ const VerificationComponent = () => {
                 backgroundColor: "#00a3b1",
               },
             }}
-            onClick={() => navigate("/dashboard/profile")}
+            onClick={() => {
+              dispatch(setActivePath("dashboard"));
+              navigate("/dashboard/profile");
+            }}
           >
             Receive Approval
           </Button>

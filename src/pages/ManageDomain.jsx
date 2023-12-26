@@ -19,6 +19,7 @@ import CreateSmtpUserDialog from "../components/common/CreateSmtpUserDialog";
 import SimpleBackdrop from "../components/common/Backdrop";
 import SmtpUserTable from "../components/common/SmtpUserTable";
 import { NoAccounts } from "@mui/icons-material";
+import { setActivePath } from "../app/redux/features/slices/global/globalSlice";
 
 const ManageDomain = () => {
   const navigate = useNavigate();
@@ -44,11 +45,18 @@ const ManageDomain = () => {
     setOpenSmtpUserDialog(false);
   };
 
-  const { data, isSuccess, isLoading } = useGetDnsRecordsQuery({
-    domain_id: selectedDomain.id,
-    company_id: activeCompany.id,
-    token: userInfo.token,
-  });
+  const { data, isSuccess, isLoading } = useGetDnsRecordsQuery(
+    {
+      domain_id: selectedDomain.id,
+      company_id: activeCompany.id,
+      token: userInfo.token,
+    },
+    { refetchOnMountOrArgChange: true }
+  );
+
+  useEffect(() => {
+    console.log(data);
+  }, [data]);
 
   return (
     <>
@@ -65,6 +73,7 @@ const ManageDomain = () => {
         startIcon={<KeyboardBackspaceIcon />}
         onClick={() => {
           dispatch(setSelectedDomain(null));
+          dispatch(setActivePath("domains"));
           navigate("/domains");
         }}
       >

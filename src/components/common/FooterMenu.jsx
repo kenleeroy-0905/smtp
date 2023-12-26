@@ -1,6 +1,7 @@
 import { Box, IconButton, Stack, Typography } from "@mui/material";
 import React, { useState } from "react";
 import DashboardCustomizeOutlinedIcon from "@mui/icons-material/DashboardCustomizeOutlined";
+import EmailIcon from "@mui/icons-material/Email";
 import PublicIcon from "@mui/icons-material/Public";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { useNavigate } from "react-router-dom";
@@ -17,6 +18,12 @@ const menuItems = [
     icon: <PublicIcon />,
     state: "domains",
     path: "/domains",
+  },
+  {
+    title: "Email Activity",
+    icon: <EmailIcon />,
+    state: "email",
+    path: "/emails",
   },
 ];
 

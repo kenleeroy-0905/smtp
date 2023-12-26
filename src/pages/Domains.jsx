@@ -1,6 +1,6 @@
 import { Box, Button, Grid, Stack, Typography } from "@mui/material";
 import AddBoxIcon from "@mui/icons-material/AddBox";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import DomainsTable from "../components/common/DomainsTable";
 import DomainInput from "../components/common/DomainInput";
 import { useSelector } from "react-redux";
@@ -16,10 +16,26 @@ const Domains = () => {
     setOpenDomainInput(false);
   };
 
-  const { data, isSuccess, isLoading } = useDomainListQuery({
-    id: activeCompany.id,
-    token: userInfo.token,
-  });
+  const { data, isSuccess, isLoading, isFetching } = useDomainListQuery(
+    {
+      id: activeCompany.id,
+      token: userInfo.token,
+    },
+    { refetchOnMountOrArgChange: true }
+  );
+
+  {
+    isLoading && <SimpleBackdrop status={isLoading} />;
+  }
+  {
+    isFetching && <SimpleBackdrop status={isFetching} />;
+  }
+
+  useEffect(() => {
+    if (data?.data === null) {
+      setOpenDomainInput(true);
+    }
+  }, [activeCompany]);
 
   return (
     <>
